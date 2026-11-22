@@ -28,8 +28,8 @@
         <header class="hero">
             <div class="eyebrow">Endless reincarnation · interactive CYOA</div>
             <h1 id="main-title">Build your next life.</h1>
-            <p class="muted" id="main-intro">Your karma becomes the starting resource for your next incarnation. Choose
-                a world, background, physique, perks, and powers.</p>
+            <p class="muted" id="main-intro">Your karma becomes the starting resource for your next incarnation. Open
+                each category to read about it and reveal its choices.</p>
         </header>
 
         <div class="toolbar">
@@ -40,16 +40,26 @@
         <div id="sections"></div>
 
         <section class="section">
-            <div class="section-head">
-                <div>
-                    <h2>Allocate Stats</h2>
-                    <p class="desc" id="stat-description"></p>
+            <button class="section-toggle" id="stats-toggle" type="button" aria-expanded="false"
+                aria-controls="stats-content">
+                <span class="section-toggle-main">
+                    <span class="section-toggle-title">Allocate Stats</span>
+                    <span class="section-toggle-meta">Customize your attributes</span>
+                </span>
+                <span class="section-chevron" id="stats-chevron" aria-hidden="true">+</span>
+            </button>
+            <div class="section-content" id="stats-content" hidden>
+                <p class="desc" id="stat-description"></p>
+                <p class="stat-rule" id="stat-rule"></p>
+                <div class="stat-allocation-bar">
+                    <strong id="stat-points-remaining">20 attribute points available</strong>
+                    <button id="buy-stat-point" type="button" class="primary">Buy +1 attribute point · 1 karma</button>
                 </div>
+                <div class="stat-grid" id="stat-grid"></div>
             </div>
-            <div class="stat-grid" id="stat-grid"></div>
         </section>
 
-        <div class="site-credit">Local-first CYOA builder · edits and selections are saved in this browser</div>
+        <div class="site-credit">Local-first CYOA builder · content edits are saved here; use Save build to keep your choices</div>
     </main>
 
     <footer class="sticky-footer">
@@ -57,6 +67,10 @@
             <div>
                 <span class="small muted">Available karma</span>
                 <div class="points" id="points">0</div>
+            </div>
+            <div>
+                <span class="small muted">Attribute points</span>
+                <div class="points attribute-points" id="attribute-points">30</div>
             </div>
             <div>
                 <span class="small muted">Selected</span><br>

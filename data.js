@@ -854,9 +854,15 @@ window.KARMA_DATA = {
     }
   ],
   "stats": {
-    "starting": 20,
-    "description": "Allocate your default 20 stat points. One karma point buys one stat point. The source describes an average stat as 5 and 10 as a super-genius level; above 10 is beyond genius.",
+    "starting": 30,
+    "description": "Allocate your default 30 stat points. One karma point buys one stat point. The source describes an average stat as 5 and 10 as a super-genius level; above 10 is beyond genius.",
     "attributes": [
+
+      {
+        "id": "constitution",
+        "name": "Constitution",
+        "description": "The body's limit and training ceiling. The hard limit for allocated points is twice Constitution."
+      },
       {
         "id": "strength",
         "name": "Strength",
@@ -872,11 +878,7 @@ window.KARMA_DATA = {
         "name": "Agility",
         "description": "The ability to move quickly."
       },
-      {
-        "id": "constitution",
-        "name": "Constitution",
-        "description": "The body's limit and training ceiling. The hard limit for allocated points is twice Constitution."
-      },
+      
       {
         "id": "perception",
         "name": "Perception",
