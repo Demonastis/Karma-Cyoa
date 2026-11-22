@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive CYOA Points Shop</title>
+  <style>
+    :root {
+      --bg-color: #121218;
+      --card-bg: #1e1e28;
+      --card-hover: #272734;
+      --selected-bg: #252b42;
+      --selected-border: #5c8df6;
+      --text-main: #f0f0f5;
+      --text-muted: #a0a0b5;
+      --cost-color: #ff6b6b;
+      --gain-color: #51cf66;
+      --disabled-opacity: 0.45;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-top: 80px; /* Space for sticky header */
+      padding-bottom: 60px;
+      line-height: 1.5;
+    }
+
+    /* Sticky Top Bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(18, 18, 24, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #2e2e3d;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .points-display {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .points-value {
+      color: var(--gain-color);
+      font-size: 1.4rem;
+      margin-left: 6px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button.btn {
+      background-color: #2e2e3d;
+      color: var(--text-main);
+      border: 1px solid #45455a;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    button.btn:hover {
+      background-color: #3d3d52;
+    }
+
+    button.btn-primary {
+      background-color: var(--selected-border);
+      border-color: var(--selected-border);
+      color: #fff;
+    }
+
+    button.btn-primary:hover {
+      background-color: #4a7be0;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header.intro {
+      text-align: center;
+      margin: 30px 0 50px;
+    }
+
+    header.intro h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    header.intro p {
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 50px;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      border-bottom: 2px solid #2e2e3d;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    /* Card Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* Choice Cards */
+    .card {
+      background-color: var(--card-bg);
+      border: 2px solid #2e2e3d;
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .card:hover:not(.disabled) {
+      background-color: var(--card-hover);
+      transform: translateY(-2px);
+    }
+
+    .card.selected {
+      background-color: var(--selected-bg);
+      border-color: var(--selected-border);
+      box-shadow: 0 0 15px rgba(92, 141, 246, 0.2);
+    }
+
+    .card.disabled {
+      opacity: var(--disabled-opacity);
+      cursor: not-allowed;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .card-cost {
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .cost-spend {
+      background-color: rgba(255, 107, 107, 0.15);
+      color: var(--cost-color);
+    }
+
+    .cost-gain {
+      background-color: rgba(81, 207, 102, 0.15);
+      color: var(--gain-color);
+    }
+
+    .cost-free {
+      background-color: rgba(160, 160, 181, 0.15);
+      color: var(--text-muted);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 140px;
+      background-color: #15151d;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4a4a5e;
+      font-size: 0.85rem;
+      overflow: hidden;
+    }
+
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      flex-grow: 1;
+    }
+
+    /* Summary Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid #3d3d52;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      padding: 25px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      margin-bottom: 15px;
+    }
+
+    .summary-list {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .summary-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #2e2e3d;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Points Tracker -->
+  <div class="top-bar">
+    <div class="points-display">
+      Points: <span id="points-counter" class="points-value">20</span>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="resetSelections()">Reset</button>
+      <button class="btn btn-primary" onclick="openSummary()">Show Build</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="intro">
+      <h1>Adventurer's Armory</h1>
+      <p>You have been granted <strong>20 Points</strong> to prepare for your journey. Click on items to purchase them, or take on drawbacks to earn extra points.</p>
+    </header>
+
+    <!-- Sections will be injected here by JavaScript -->
+    <main id="shop-container"></main>
+  </div>
+
+  <!-- Build Summary Modal -->
+  <div class="modal-overlay" id="summary-modal">
+    <div class="modal">
+      <h2>Your Selected Build</h2>
+      <ul class="summary-list" id="summary-list"></ul>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>Remaining Points: <span id="summary-points">0</span></strong>
+        <button class="btn btn-primary" onclick="closeSummary()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. CONFIGURATION & SHOP DATA
+    // ==========================================
+    const STARTING_POINTS = 20;
+
+    const shopData = [
+      {
+        title: "Starting Origin (Pick One)",
+        description: "Choose your background. Selecting a new origin replaces your previous choice.",
+        maxChoices: 1, // Enforces single-choice category
+        items: [
+          {
+            id: "origin_noble",
+            name: "Disgraced Noble",
+            cost: 4, // Positive number = costs points
+            description: "You have formal education, courtly manners, and a family signet ring.",
+            image: "" // Optional: put an image URL here
+          },
+          {
+            id: "origin_wanderer",
+            name: "Seasoned Wanderer",
+            cost: 0,
+            description: "You know how to survive in the wild, track game, and read the weather.",
+            image: ""
+          },
+          {
+            id: "origin_urchin",
+            name: "Street Urchin",
+            cost: -3, // Negative number = grants extra points
+            description: "You grew up with nothing. You are nimble, but lack formal training (+3 Points).",
+            image: ""
+          }
+        ]
+      },
+      {
+        title: "Equipment & Perks",
+        description: "Select as many items and abilities as your points allow.",
+        maxChoices: null, // Unlimited choices
+        items: [
+          {
+            id: "item_sword",
+            name: "Runed Longsword",
+            cost: 6,
+            description: "A finely balanced blade etched with glowing runes that cut through magical shields.",
+            image: ""
+          },
+          {
+            id: "item_cloak",
+            name: "Cloak of Shadows",
+            cost: 5,
+            description: "Blends seamlessly into dim light and muffles the sound of your footsteps.",
+            image: ""
+          },
+          {
+            id: "item_alchemy",
+            name: "Bottomless Satchel",
+            cost: 4,
+            description: "A small leather pouch capable of holding a wagon's worth of supplies weightlessly.",
+            image: ""
+          },
+          {
+            id: "item_magic",
+            name: "Spark of Arcana",
+            cost: 8,
+            description: "Unlocks basic elemental magic: light fires, move small objects, and sense magic.",
+            image: ""
+          },
+          {
+            id: "item_companion",
+            name: "Loyal Hound",
+            cost: 3,
+            description: "A fearless mastiff that alerts you to danger and fights by your side.",
+            image: ""
+          },
+          {
+            id: "item_rations",
+            name: "Traveler's Kit",
+            cost: 1,
+            description: "Rope, flint and steel, bedroll, waterskin, and two weeks of dried rations.",
+            image: ""
+          }
+        ]
+      },
+      {
+        title: "Drawbacks",
+        description: "Complicate your journey to gain extra points for the shop above.",
+
+maxChoices: null,
+items: [
+{
+id: "drawback_bounty",
+name: "Wanted Criminal",
+cost: -5,
+description: "A wealthy guild has placed a bounty on your head. Bounty hunters will occasionally track you.",
+image: ""
+},
+{
+id: "drawback_curse",
+name: "Beacon of Monsters",
+cost: -4,
+description: "Wild beasts and monsters are unusually aggressive toward you.",
+image: ""
+},
+{
+id: "drawback_honest",
+name: "Oath of Truth",
+cost: -3,
+description: "You are magically compelled never to tell a direct lie.",
+image: ""
+}
+]
+}
+];
+// ==========================================
+// 2. APPLICATION STATE & LOGIC
+// ==========================================
+let currentPoints = STARTING_POINTS;
+const selectedIds = new Set();
+function initShop() {
+const container = document.getElementById("shop-container");
+container.innerHTML = "";
+shopData.forEach((section, sectionIndex) => {
+const sectionEl = document.createElement("section");
+sectionEl.className = "section";
+sectionEl.innerHTML = <h2 class="section-title">${section.title}</h2> <p class="section-desc">${section.description}</p> <div class="grid" id="grid-${sectionIndex}"></div>;
+container.appendChild(sectionEl);
+const gridEl = sectionEl.querySelector(".grid");
+section.items.forEach(item => {
+const card = document.createElement("div");
+card.className = "card";
+card.id = card-${item.id};
+card.onclick = () => toggleItem(item, section);
+// Format cost label
+let costText = "Free";
+let costClass = "cost-free";
+if (item.cost > 0) {
+costText = -${item.cost} Pts;
+costClass = "cost-spend";
+} else if (item.cost < 0) {
+costText = +${Math.abs(item.cost)} Pts;
+costClass = "cost-gain";
+}
+// Optional image handling
+const imgHtml = item.image
+? <div class="card-img"><img src="${item.image}" alt="${item.name}"></div>
+: "";
+card.innerHTML = <div class="card-header"> <span class="card-title">${item.name}</span> <span class="card-cost ${costClass}">${costText}</span> </div> ${imgHtml} <div class="card-body">${item.description}</div>;
+gridEl.appendChild(card);
+});
+});
+updateUI();
+}
+function toggleItem(item, section) {
+const isSelected = selectedIds.has(item.id);
+if (isSelected) {
+// Check if deselecting a point-granting drawback would put points below 0
+if (item.cost < 0 && (currentPoints + item.cost < 0)) {
+alert("You must unselect some costly items before removing this drawback!");
+return;
+}
+selectedIds.delete(item.id);
+currentPoints += item.cost;
+} else {
+// Handle single-choice sections (e.g., Pick One)
+if (section.maxChoices === 1) {
+const existingChoice = section.items.find(i => selectedIds.has(i.id));
+if (existingChoice) {
+const netPointsAfterSwap = currentPoints + existingChoice.cost - item.cost;
+if (netPointsAfterSwap < 0) return; // Can't afford the swap
+selectedIds.delete(existingChoice.id);
+currentPoints += existingChoice.cost;
+}
+}
+// Check if user can afford the item
+if (currentPoints - item.cost < 0) {
+return;
+}
+selectedIds.add(item.id);
+currentPoints -= item.cost;
+}
+updateUI();
+}
+function updateUI() {
+// Update top bar points
+const pointsEl = document.getElementById("points-counter");
+pointsEl.textContent = currentPoints;
+pointsEl.style.color = currentPoints === 0 ? "var(--text-muted)" : "var(--gain-color)";
+// Update card visual states
+shopData.forEach(section => {
+// Find if another item is selected in a maxChoices=1 section
+const existingSingleChoice = section.maxChoices === 1
+? section.items.find(i => selectedIds.has(i.id))
+: null;
+section.items.forEach(item => {
+const card = document.getElementById(card-${item.id});
+const isSelected = selectedIds.has(item.id);
+card.classList.toggle("selected", isSelected);
+// Determine if item should be grayed out (unaffordable)
+if (!isSelected) {
+let effectiveBudget = currentPoints;
+if (existingSingleChoice) {
+effectiveBudget += existingSingleChoice.cost;
+}
+const canAfford = (effectiveBudget - item.cost) >= 0;
+card.classList.toggle("disabled", !canAfford);
+} else {
+card.classList.remove("disabled");
+}
+});
+});
+}
+function resetSelections() {
+selectedIds.clear();
+currentPoints = STARTING_POINTS;
+updateUI();
+}
+function openSummary() {
+const list = document.getElementById("summary-list");
+list.innerHTML = "";
+if (selectedIds.size === 0) {
+list.innerHTML = "No items selected yet.";
+} else {
+shopData.forEach(section => {
+section.items.forEach(item => {
+if (selectedIds.has(item.id)) {
+const li = document.createElement("li");
+const costLabel = item.cost > 0 ? -${item.cost} : (item.cost < 0 ? +${Math.abs(item.cost)} : "0");
+li.innerHTML = <span>${item.name}</span> <span>${costLabel} Pts</span>;
+list.appendChild(li);
+}
+});
+});
+}
+document.getElementById("summary-points").textContent = currentPoints;
+document.getElementById("summary-modal").classList.add("active");
+}
+function closeSummary() {
+document.getElementById("summary-modal").classList.remove("active");
+}
+// Start the app
+initShop();
