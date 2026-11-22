@@ -1,0 +1,97 @@
+REINCARNATION THROUGH KARMA
+
+INTRODUCTION
+“Game Over. Your karma value is being calculated. Please wait a moment. While you wait, here are the rules.”
+
+CORE RULES
+Upon death, you arrive to be judged by your karma. You may use it to decide your next life, including perks, background, physique, and special abilities.
+
+Karma represents the good your actions accomplish, regardless of your thoughts or intentions. Outcomes matter.
+
+You do not retain memories of previous lives unless you purchase perks or physiques that allow memory retention.
+
+Your remaining good karma is converted into providence: essentially, good luck.
+
+If you die as a baby, all spent points are returned so you can try again.
+
+Powers chosen through this CYOA that do not fit the next world's rules acclimatize and become variants of that world's power system.
+
+YOUR PAST — KARMA TIERS
++100 — Saint: Virtue reaches legendary scale, such as curing cancer, preventing a great tragedy, or saving the world through peaceful means.
++80 — Positively Good (Paragon): Purely selfless, empathetic, and incorruptible; consistently sacrifices personal gain for the greater good.
++60 — Noble / Heroic: Helps others even at personal detriment, while still capable of selfishness.
++40 — Virtuous / Kind-Hearted: Goes out of their way to donate, help animals, volunteer at shelters, and help others.
++20 — Decent / Well-Meaning: Kind to others, respects elders, and is generally a good person.
+0 — True Neutral / Pragmatic: Has done both good and bad.
+-20 — Self-Serving / Opportunistic: Prioritizes personal comfort, profit, or safety; bends rules and takes advantage of situations without being overtly cruel.
+-40 — Morally Corrupt / Unscrupulous: Manipulative, greedy, or callous; willingly exploits or harms others to gain power, wealth, or personal goals.
+-60 — Malicious / Villainous: Driven by hatred, tyranny, or cruelty; actively seeks to dominate, destroy, or inflict suffering.
+-80 — Depraved / Sadistic: Takes pleasure in pain, chaos, and ruin; rejects empathy and commits atrocities without remorse.
+-100 — Absolute Evil (Abomination): Exists solely to cause maximum suffering, annihilation, or corruption.
+
+BACKGROUND — FAMILY WEALTH
+Destitute / Poverty: Unable to consistently afford food, shelter, and healthcare.
+Paycheck-to-Paycheck / Working Poor: Basic needs are met, but one emergency can cause a financial crisis.
+Middle Class: Comfortable living standard, steady income, and manageable debt, but reliant on a paycheck.
+Upper-Middle Class / Affluent: High income, strong savings rate, and significant discretionary spending.
+Rich / Wealthy: Income from investments and assets matches or exceeds active salary.
+Generational / Dynastic Wealth (Apex): Self-sustaining capital across multiple lifetimes without active labor.
+
+BACKGROUND — FAMILY LIFE
+Authoritative & Relational: Clear boundaries, mutual respect, warmth, and open communication; conflicts are addressed through listening rather than blame.
+Communal & Interdependent: Shared responsibilities, teamwork, mutual support, and encouragement of individual growth.
+Transactional: Stable and polite relationships focused on practical logistics and duties rather than emotional vulnerability.
+Image-Conscious: Prioritizes appearances, status, and perfectionism; members may hide flaws and suppress difficult emotions.
+Competitive: Love, praise, and attention feel scarce; members compete for approval.
+Emotionally Detached / Uninvolved: Little affection, empathy, or support; needs often go unacknowledged.
+Abusive, Chaotic & Authoritarian: Fear, rigid control, unpredictability, or verbal and physical harm undermine safety and self-worth.
+
+WORLD
+Types: Normal, Magic, Xianxia, Wuxia, Game, Super, and Mythos.
+Timeline: Prehistoric & Mythic, Medieval, Industrial, Modern, Near Future, and Far Future.
+Genres: Slice of Life (from murder mystery to a happy, simple life); Adventure (danger may arise if sought or encountered); Dangerous (threats range from distant world-ending dangers to attacks on ordinary people); Dystopian (a broken system makes progress difficult); Collapse (the world is already in serious danger, such as an apocalypse).
+
+PHYSIQUE
+Genetics can affect heritage and family connections. A genius may be born into a family of scholars; unusual strength may connect someone to athletes or soldiers. Alternatively, traits may re-emerge from distant ancestry.
+
+Advantages: Hyper Memory (you don't forget); Bodily Memory (faster retention of muscle memory); Genius (3× Intelligence); Barbarian (2× Strength and Endurance, 1.5× Agility); Titan (2.5× Strength and Constitution, 0.8× Agility); Swiftwind (2.5× Agility, 1.5× Endurance); Hawk-Eye (3× Perception); Iron Lung (3× Endurance); Prodigy Vessel (2× Constitution and 1.5× all physical stats); Hyper-Cognition (2× Intelligence and Perception); Apex Predator (1.8× Strength, Agility, and Perception).
+
+Disadvantages: Blind; Deaf; Mute; Sickly (0.2× Constitution); Frail (0.4× Strength and Constitution); Sluggish (0.4× Agility); Asthmatic (0.3× Endurance); Dull Senses (0.3× Perception); Glass Cannon (1.5× Strength and Agility, 0.3× Constitution); Scatterbrained (0.4× Intelligence, 0.7× Perception); Muscle Atrophy (0.2× Strength); Race Change to Animal; Race Change to Insect.
+
+STATS
+Default allocation: 20. One karma point equals one stat point. Average stat: 5. A stat of 10 is described as super-genius level; above 10 is beyond genius.
+Strength: ability to lift.
+Endurance: ability to keep moving.
+Agility: ability to move quickly.
+Constitution: body's limit and training ceiling; allocated points have a hard limit of twice Constitution.
+Perception: senses, including social cues, distance vision, and smell.
+Intelligence: referenced by physique modifiers; the source does not separately define it.
+
+PERKS
+Old Soul: Retain current-life memories into the next life, awakening randomly or during distressing events.
+Self-Made Destiny: Future-predicting powers are influenced by you, making their predictions faulty in ways that lead toward what you want them to see.
+Strong Mind: Immunity to mind-reading and stronger self-determination.
+Boredom Immunity: Continue enjoying activities for extended periods without becoming bored.
+Plot Armor: Destiny assigns you a role in the plot; performance affects the role and its archetypal protection.
+Unique Snowflake: Powers that try to copy you or your abilities always fail in some form.
+Free Will: Break free from constraints; destiny cannot control or protect you.
+
+POWERS
+Physical: Kinetic Battery; Cellular Regeneration; Combat Flow; Environmental Constitution; Density Control; Bio-Electricity; Adrenaline Surge; Chameleon Skin.
+Mental: Parallel Processing; Mind Palace; Emotional Dampening; Lie Detection; Psychometry; Mental Firewall; Dream Walking; Sensory Tuning.
+Knowledge: Field Medicine; Tactical Command; Structural Engineering; Polyglot; Alchemy & Chemistry; Survivalism; Cryptography; Psychology & Manipulation.
+Magical: Rune Weaving; Mana Sight; Spatial Pocket; Elemental Transmutation; Shadow Step; Soul-Bound Weapon; Gravity Nudge; Ward Crafting.
+Other: Danger Sense; Luck Manipulation; Synergy Link; Skill Copy; Karma Ledger; Save State; Item Appraisal; Familiar Bond.
+Descriptions for each power are available in the interactive builder.
+
+DRAWBACKS
+Honesty Compulsion: Cannot tell a direct lie; omissions and clever phrasing remain possible, but false statements cause sharp headaches.
+Sensory Overload: Heightened senses cannot be turned down; crowds, bright lights, and strong smells can be painful.
+Bounty Target: A powerful local guild, faction, or monster hunter actively tracks you.
+Code of Honor: Bound by a strict personal code.
+Technological Bane: Technology fails when you try to work with it.
+Lazy: Persistently lazy.
+Depressed: Persistent feeling of sadness.
+
+EDITORIAL NOTES
+The supplied source did not define point costs for most backgrounds, physique options, perks, powers, or drawbacks. These are set to zero in the builder until edited. Spelling, grammar, punctuation, and consistency have been cleaned up while retaining the original concepts. Where a rule was incomplete, it has not been silently invented.

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Content Editor — Reincarnation Through Karma</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="top">
+        <div class="brand">Content Editor</div>
+        <nav class="nav"><a href="index.html">Builder</a><a href="guide.html">Rules & Guide</a></nav>
+        <div class="actions"><button id="new-section">Add section</button><button id="export" class="primary">Export
+                content JSON</button></div>
+    </div>
+    <main class="wrap">
+        <header class="hero">
+            <div class="eyebrow">Manage your CYOA</div>
+            <h1>Edit the content.</h1>
+            <p class="muted">Change titles, descriptions, costs, and selection rules; add or remove sections and
+                choices. Changes are stored in this browser. Export a JSON backup to move edits to another device.</p>
+        </header>
+        <div class="toolbar"><input id="filter" placeholder="Filter sections and choices…"><button id="reset-content"
+                class="danger">Restore original content</button></div>
+        <div id="editor"></div>
+    </main>
+    <script src="data.js"></script>
+    <script>
+        const clone = o => JSON.parse(JSON.stringify(o)), DEFAULT = clone(window.KARMA_DATA); let data = (() => { try { return JSON.parse(localStorage.getItem("karma-data")) || clone(DEFAULT) } catch { return clone(DEFAULT) } })();
+        const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        function save() { localStorage.setItem("karma-data", JSON.stringify(data)); }
+        function render() { let q = document.querySelector("#filter").value.toLowerCase(); document.querySelector("#editor").innerHTML = data.sections.map((s, si) => { let items = s.items.map((it, ii) => ({ ...it, _ii: ii })).filter(i => (i.name + i.description).toLowerCase().includes(q)); if (!items.length && !s.title.toLowerCase().includes(q)) return ""; return `<details open><summary>${esc(s.title)} <span class="muted small">(${s.items.length} choices)</span></summary><div class="panel"><label>Section title<input data-section="${si}" data-field="title" value="${esc(s.title)}"></label><label>Section description<textarea data-section="${si}" data-field="description">${esc(s.description)}</textarea></label><label>Selection rule<select data-section="${si}" data-field="mode"><option value="multiple" ${s.mode === "multiple" ? "selected" : ""}>Choose any</option><option value="single" ${s.mode === "single" ? "selected" : ""}>Choose one</option></select></label><div class="form-actions"><button data-add="${si}">Add choice</button><button class="danger" data-remove-section="${si}">Delete section</button></div>${items.map(i => `<div class="panel"><div class="form-row"><label>Choice name<input data-item="${si},${i._ii}" data-field="name" value="${esc(i.name)}"></label><label>Cost / reward<input type="number" data-item="${si},${i._ii}" data-field="cost" value="${Number(i.cost) || 0}"></label></div><label>Description<textarea data-item="${si},${i._ii}" data-field="description">${esc(i.description)}</textarea></label><div class="form-actions"><button class="danger" data-remove-item="${si},${i._ii}">Delete choice</button></div></div>`).join("")}</div></details>` }).join("") || '<p class="empty">No matches.</p>' }
+        document.addEventListener("input", e => { if (e.target.dataset.section !== undefined) { let s = data.sections[+e.target.dataset.section]; s[e.target.dataset.field] = e.target.value; save() } else if (e.target.dataset.item) { let [s, i] = e.target.dataset.item.split(",").map(Number); data.sections[s].items[i][e.target.dataset.field] = e.target.dataset.field === "cost" ? Number(e.target.value) : e.target.value; save() } else if (e.target.id === "filter") render() });
+        document.addEventListener("change", e => { if (e.target.dataset.section !== undefined) { data.sections[+e.target.dataset.section][e.target.dataset.field] = e.target.value; save() } });
+        document.addEventListener("click", e => { let b = e.target.closest("button"); if (!b) return; if (b.dataset.add !== undefined) { let s = data.sections[+b.dataset.add]; s.items.push({ id: "choice-" + Date.now(), name: "New choice", cost: 0, description: "Add a description." }); save(); render() } if (b.dataset.removeItem) { let [s, i] = b.dataset.removeItem.split(",").map(Number); if (confirm("Delete this choice?")) { data.sections[s].items.splice(i, 1); save(); render() } } if (b.dataset.removeSection !== undefined) { if (confirm("Delete this entire section?")) { data.sections.splice(+b.dataset.removeSection, 1); save(); render() } } if (b.id === "new-section") { data.sections.push({ id: "section-" + Date.now(), title: "New Section", description: "Describe this section.", mode: "multiple", items: [] }); save(); render() } if (b.id === "reset-content" && confirm("Restore the original content? Your current edits will be lost.")) { data = clone(DEFAULT); save(); render() } if (b.id === "export") { let a = document.createElement("a"), u = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })); a.href = u; a.download = "karma-content.json"; a.click(); URL.revokeObjectURL(u) } });
+        render();
+    </script>
+</body>
+
+</html>
