@@ -6,7 +6,7 @@
 - `guide.html` — cleaned-up rules and stat reference.
 - `data.js` — editable source content used by the builder.
 - `app.js` / `styles.css` — application behavior and styling.
-- `Reincarnation Through Karma - cleaned.txt` — cleaned narrative source.
+- `Reincarnation Through Karma.txt` — choices source.
 
 ## Run it
 Open `index.html` in a modern browser. The builder and editor work without a server. On the Builder page, open a main category (Background, World, Physique, or Powers) to reveal its related sections, then open a section to read its explanation and reveal its choices. Open **Allocate Stats** and enter allocated points directly in each attribute's number box. Buy an extra unspent attribute point with karma or sell an unspent attribute point for karma using the adjacent buttons. Selected numeric physique modifiers change final stat values and stack multiplicatively; modified Constitution sets the allocation cap for other stats. The footer shows remaining karma and unspent attribute points. Content edits and attribute allocations are stored in browser local storage. Use **Save build** or **Export** to save selected choices, stats, and purchased/sold attribute points as a JSON file for later import.
