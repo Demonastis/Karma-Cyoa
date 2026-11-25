@@ -877,43 +877,43 @@ window.KARMA_DATA = {
         {
           "id": "honesty-compulsion",
           "name": "Honesty Compulsion",
-          "cost": 10,
+          "cost": -10,
           "description": "You cannot tell a direct lie. You may omit details or phrase things cleverly, but false statements cause sharp headaches."
         },
         {
           "id": "sensory-overload",
           "name": "Sensory Overload",
-          "cost": 10,
+          "cost": -10,
           "description": "Heightened senses cannot be turned down, making crowds, bright lights, and strong smells painful without protection."
         },
         {
           "id": "bounty-target",
           "name": "Bounty Target",
-          "cost": 20,
+          "cost": -20,
           "description": "A powerful local guild, faction, or monster hunter starts with your description and actively tracks you."
         },
         {
           "id": "code-of-honor",
           "name": "Code of Honor",
-          "cost": 20,
+          "cost": -20,
           "description": "You are bound by a strict personal code."
         },
         {
           "id": "technological-bane",
           "name": "Technological Bane",
-          "cost": 20,
+          "cost": -20,
           "description": "Technology fails when you try to work with it."
         },
         {
           "id": "lazy",
           "name": "Lazy",
-          "cost": 10,
+          "cost": -10,
           "description": "You feel persistently lazy."
         },
         {
           "id": "depressed",
           "name": "Depressed",
-          "cost": 20,
+          "cost": -20,
           "description": "You experience a persistent feeling of sadness."
         }
       ]
