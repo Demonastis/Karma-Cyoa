@@ -63,7 +63,10 @@
     flex-basis: 100%;
     height: 8px;
   }
-  .stat-allocation-bar > button {
+  .stat-allocation-actions {
+    width: 100%;
+  }
+  .stat-allocation-actions > button {
     width: 100%;
   }
 }
@@ -326,6 +329,10 @@ textarea {
   border-left: 2px solid var(--line);
 }
 
+.background-randomize {
+  margin-bottom: 12px;
+}
+
 .group-content[hidden] {
   display: none;
 }
@@ -556,33 +563,45 @@ summary {
   color: var(--good);
 }
 
-.stat-controls {
+.stat-allocation-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: auto;
 }
 
-.stat-adjust {
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  font-size: 1.4rem;
-}
-
-.stat-adjust:disabled,
-#buy-stat-point:disabled {
+#buy-stat-point:disabled,
+#sell-stat-point:disabled {
   opacity: .45;
   cursor: not-allowed;
   transform: none;
   box-shadow: var(--shadow);
 }
 
-.stat-control-label {
-  flex: 1;
-  text-align: center;
+.stat-number-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   color: var(--muted);
   font-size: .85rem;
+}
+
+.stat-allocation-control {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.stat-allocation-input {
+  width: 100%;
+  max-width: 140px;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 .attribute-points {

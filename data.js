@@ -321,67 +321,105 @@ window.KARMA_DATA = {
         {
           "id": "hyper-memory",
           "name": "Hyper Memory",
-          "cost": 0,
+          "cost": 10,
           "description": "You don't forget."
         },
         {
           "id": "bodily-memory",
           "name": "Bodily Memory",
-          "cost": 0,
+          "cost": 10,
           "description": "Your body retains muscle memory faster."
         },
         {
           "id": "genius",
           "name": "Genius",
-          "cost": 0,
+          "cost": 20,
+          "modifiers": {
+            "intelligence": 3
+          },
           "description": "3× modifier to Intelligence."
         },
         {
           "id": "barbarian",
           "name": "Barbarian",
-          "cost": 0,
+          "cost": 30,
+          "modifiers": {
+            "strength": 2,
+            "endurance": 2,
+            "agility": 1.5
+          },
           "description": "2× Strength and Endurance; 1.5× Agility."
         },
         {
           "id": "titan",
           "name": "Titan",
-          "cost": 0,
+          "cost": 30,
+          "modifiers": {
+            "strength": 2.5,
+            "constitution": 2.5,
+            "agility": 0.8
+          },
           "description": "2.5× Strength and Constitution, greatly raising the training cap; 0.8× Agility."
         },
         {
           "id": "swiftwind",
           "name": "Swiftwind",
-          "cost": 0,
+          "cost": 20,
+          "modifiers": {
+            "agility": 2.5,
+            "endurance": 1.5
+          },
           "description": "2.5× Agility and 1.5× Endurance."
         },
         {
           "id": "hawk-eye",
           "name": "Hawk-Eye",
-          "cost": 0,
+          "cost": 30,
+          "modifiers": {
+            "perception": 3
+          },
           "description": "3× Perception; notice tiny details, distant targets, and subtle body language."
         },
         {
           "id": "iron-lung",
           "name": "Iron Lung",
-          "cost": 0,
+          "cost": 30,
+          "modifiers": {
+            "endurance": 3
+          },
           "description": "3× Endurance; resist physical exhaustion far longer than normal."
         },
         {
           "id": "prodigy-vessel",
           "name": "Prodigy Vessel",
-          "cost": 0,
+          "cost": 50,
+          "modifiers": {
+            "constitution": 2,
+            "strength": 1.5,
+            "endurance": 1.5,
+            "agility": 1.5
+          },
           "description": "2× Constitution (doubling the stat allocation limit) and 1.5× all physical stats."
         },
         {
           "id": "hyper-cognition",
           "name": "Hyper-Cognition",
-          "cost": 0,
+          "cost": 40,
+          "modifiers": {
+            "intelligence": 2,
+            "perception": 2
+          },
           "description": "2× Intelligence and Perception; read people and situations quickly."
         },
         {
           "id": "apex-predator",
           "name": "Apex Predator",
-          "cost": 0,
+          "cost": 30,
+          "modifiers": {
+            "strength": 1.8,
+            "agility": 1.8,
+            "perception": 1.8
+          },
           "description": "1.8× Strength, Agility, and Perception."
         }
       ]
@@ -395,79 +433,107 @@ window.KARMA_DATA = {
         {
           "id": "blind",
           "name": "Blind",
-          "cost": 0,
+          "cost": -10,
           "description": "Can't see."
         },
         {
           "id": "deaf",
           "name": "Deaf",
-          "cost": 0,
+          "cost": -10,
           "description": "Can't hear."
         },
         {
           "id": "mute",
           "name": "Mute",
-          "cost": 0,
+          "cost": -10,
           "description": "Can't speak."
         },
         {
           "id": "sickly",
           "name": "Sickly",
-          "cost": 0,
+          "cost": -40,
+          "modifiers": {
+            "constitution": 0.2
+          },
           "description": "0.2× Constitution."
         },
         {
           "id": "frail",
           "name": "Frail",
-          "cost": 0,
+          "cost": -50,
+          "modifiers": {
+            "strength": 0.4,
+            "constitution": 0.4
+          },
           "description": "0.4× Strength and Constitution."
         },
         {
           "id": "sluggish",
           "name": "Sluggish",
-          "cost": 0,
+          "cost": -30,
+          "modifiers": {
+            "agility": 0.4
+          },
           "description": "0.4× Agility; reactions and movement are very slow."
         },
         {
           "id": "asthmatic",
           "name": "Asthmatic",
-          "cost": 0,
+          "cost": -20,
+          "modifiers": {
+            "endurance": 0.3
+          },
           "description": "0.3× Endurance; physical exertion causes rapid fatigue."
         },
         {
           "id": "dull-senses",
           "name": "Dull Senses",
-          "cost": 0,
+          "cost": -20,
+          "modifiers": {
+            "perception": 0.3
+          },
           "description": "0.3× Perception; traps, hidden enemies, and social cues are easy to miss."
         },
         {
           "id": "glass-cannon",
           "name": "Glass Cannon",
-          "cost": 0,
+          "cost": -10,
+          "modifiers": {
+            "strength": 1.5,
+            "agility": 1.5,
+            "constitution": 0.3
+          },
           "description": "1.5× Strength and Agility, but 0.3× Constitution and a very low hard cap."
         },
         {
           "id": "scatterbrained",
           "name": "Scatterbrained",
-          "cost": 0,
+          "cost": -20,
+          "modifiers": {
+            "intelligence": 0.4,
+            "perception": 0.7
+          },
           "description": "0.4× Intelligence and 0.7× Perception."
         },
         {
           "id": "muscle-atrophy",
           "name": "Muscle Atrophy",
-          "cost": 0,
+          "cost": -50,
+          "modifiers": {
+            "strength": 0.2
+          },
           "description": "0.2× Strength; heavy lifting is nearly impossible."
         },
         {
           "id": "animal-race",
           "name": "Race Change to Animal",
-          "cost": 0,
+          "cost": -20,
           "description": "Become a random animal based on your stat allocation and background. Example: high Strength and an uninvolved family may result in becoming a bear."
         },
         {
           "id": "insect-race",
           "name": "Race Change to Insect",
-          "cost": 0,
+          "cost": -40,
           "description": "Become a random insect based on your stat allocation and background. Example: high Intelligence and an interdependent background may result in becoming an ant."
         }
       ]
@@ -481,43 +547,43 @@ window.KARMA_DATA = {
         {
           "id": "old-soul",
           "name": "Old Soul",
-          "cost": 0,
+          "cost": 30,
           "description": "Your soul retains memories of your current life into the next, awakening randomly or during distressing events."
         },
         {
           "id": "self-made-destiny",
           "name": "Self-Made Destiny",
-          "cost": 0,
+          "cost": 20,
           "description": "Abilities that predict the future are influenced by you, making their predictions faulty in ways that lead toward what you want them to see."
         },
         {
           "id": "strong-mind",
           "name": "Strong Mind",
-          "cost": 0,
+          "cost": 20,
           "description": "Immunity to mind-reading abilities and stronger self-determination."
         },
         {
           "id": "boredom-immunity",
           "name": "Boredom Immunity",
-          "cost": 0,
+          "cost": 10,
           "description": "You continue to enjoy activities and can do them for extended periods without becoming bored."
         },
         {
           "id": "plot-armor",
           "name": "Plot Armor",
-          "cost": 0,
+          "cost": 20,
           "description": "Destiny involves you in the plot and assigns a role. Your performance affects the role; an archetype such as best friend grants corresponding plot protection."
         },
         {
           "id": "unique-snowflake",
           "name": "Unique Snowflake",
-          "cost": 0,
+          "cost": 20,
           "description": "Powers that try to copy you or your abilities will always fail in some form."
         },
         {
           "id": "free-will",
           "name": "Free Will",
-          "cost": 0,
+          "cost": 40,
           "description": "You can break free from your constraints and destiny cannot control you, but it cannot protect you either."
         }
       ]
@@ -531,49 +597,49 @@ window.KARMA_DATA = {
         {
           "id": "kinetic-battery",
           "name": "Kinetic Battery",
-          "cost": 0,
+          "cost": 20,
           "description": "Absorbs impact force from physical blows and stores it to boost your next strike or sprint."
         },
         {
           "id": "cellular-regeneration",
           "name": "Cellular Regeneration",
-          "cost": 0,
+          "cost": 30,
           "description": "Rapidly heals cuts, broken bones, and toxins while enough calories are stored."
         },
         {
           "id": "combat-flow",
           "name": "Combat Flow",
-          "cost": 0,
+          "cost": 20,
           "description": "Heightens reflexes and spatial awareness, helping your body dodge instinctively."
         },
         {
           "id": "environmental-constitution",
           "name": "Environmental Constitution",
-          "cost": 0,
+          "cost": 10,
           "description": "Lets your body withstand extreme heat, freezing cold, low oxygen, and high pressure without discomfort."
         },
         {
           "id": "density-control",
           "name": "Density Control",
-          "cost": 0,
+          "cost": 20,
           "description": "Temporarily increases body weight to anchor you, or reduces it to leap higher and fall safely."
         },
         {
           "id": "bio-electricity",
           "name": "Bio-Electricity",
-          "cost": 0,
+          "cost": 20,
           "description": "Generates high-voltage charges through physical contact to stun targets or jump-start electronics."
         },
         {
           "id": "adrenaline-surge",
           "name": "Adrenaline Surge",
-          "cost": 0,
+          "cost": 15,
           "description": "Manually controls adrenaline for short bursts beyond normal muscle limits without tearing ligaments."
         },
         {
           "id": "chameleon-skin",
           "name": "Chameleon Skin",
-          "cost": 0,
+          "cost": 10,
           "description": "Changes skin pigmentation and texture to blend into immediate surroundings while standing still."
         }
       ]
@@ -587,49 +653,49 @@ window.KARMA_DATA = {
         {
           "id": "parallel-processing",
           "name": "Parallel Processing",
-          "cost": 0,
+          "cost": 20,
           "description": "Splits thought into independent streams for simultaneous analysis, planning, and action."
         },
         {
           "id": "mind-palace",
           "name": "Mind Palace",
-          "cost": 0,
+          "cost": 20,
           "description": "Photographic memory, instant recall, and the ability to mentally simulate scenarios in slow motion."
         },
         {
           "id": "emotional-dampening",
           "name": "Emotional Dampening",
-          "cost": 0,
+          "cost": 10,
           "description": "Maintains calm under extreme pressure and resists panic, fear auras, and mental manipulation."
         },
         {
           "id": "lie-detection",
           "name": "Lie Detection",
-          "cost": 0,
+          "cost": 10,
           "description": "Reads subtle changes in tone, heartbeat, and micro-expressions to detect deception."
         },
         {
           "id": "psychometry",
           "name": "Psychometry",
-          "cost": 0,
+          "cost": 15,
           "description": "Reads residual emotional impressions and brief surface memories from objects by touch."
         },
         {
           "id": "mental-firewall",
           "name": "Mental Firewall",
-          "cost": 0,
+          "cost": 15,
           "description": "Creates a psychic barrier that shocks or damages anyone attempting to read, control, or invade your mind."
         },
         {
           "id": "dream-walking",
           "name": "Dream Walking",
-          "cost": 0,
+          "cost": 20,
           "description": "Remain lucid while sleeping and enter nearby sleeping targets' dreams to communicate or gather information."
         },
         {
           "id": "sensory-tuning",
           "name": "Sensory Tuning",
-          "cost": 0,
+          "cost": 10,
           "description": "Precisely controls the five senses: zoom vision, filter background noise, or block pain signals."
         }
       ]
@@ -643,49 +709,49 @@ window.KARMA_DATA = {
         {
           "id": "field-medicine",
           "name": "Field Medicine",
-          "cost": 0,
+          "cost": 20,
           "description": "Mastery of anatomy, emergency surgery, herbalism, and battlefield trauma care."
         },
         {
           "id": "tactical-command",
           "name": "Tactical Command",
-          "cost": 0,
+          "cost": 20,
           "description": "Deep understanding of military strategy, logistics, terrain advantages, and small-unit tactics."
         },
         {
           "id": "structural-engineering",
           "name": "Structural Engineering",
-          "cost": 0,
+          "cost": 20,
           "description": "Identifies structural weak points in buildings, bridges, and armor, and methods to fortify or demolish them."
         },
         {
           "id": "polyglot",
           "name": "Polyglot",
-          "cost": 0,
+          "cost": 10,
           "description": "Instant fluency in reading, writing, and speaking any mundane or ancient language encountered."
         },
         {
           "id": "alchemy-chemistry",
           "name": "Alchemy & Chemistry",
-          "cost": 0,
+          "cost": 20,
           "description": "Knowledge of chemical reactions, toxicology, metallurgy, and making potions or explosives from raw ingredients."
         },
         {
           "id": "survivalism",
           "name": "Survivalism",
-          "cost": 0,
+          "cost": 15,
           "description": "Mastery of wilderness navigation, tracking, foraging, shelter building, and identifying edible or poisonous plants."
         },
         {
           "id": "cryptography",
           "name": "Cryptography",
-          "cost": 0,
+          "cost": 20,
           "description": "Spots patterns, cracks complex ciphers, bypasses digital security, and understands alien or forgotten writing systems."
         },
         {
           "id": "psychology-manipulation",
           "name": "Psychology & Manipulation",
-          "cost": 0,
+          "cost": 30,
           "description": "Deep insight into behavior, body language, social engineering, persuasion, and negotiation."
         }
       ]
@@ -699,49 +765,49 @@ window.KARMA_DATA = {
         {
           "id": "rune-weaving",
           "name": "Rune Weaving",
-          "cost": 0,
+          "cost": 20,
           "description": "Carves or draws temporary symbols on objects to grant effects such as sharpness, lightness, or fire resistance."
         },
         {
           "id": "mana-sight",
           "name": "Mana Sight",
-          "cost": 0,
+          "cost": 10,
           "description": "Sees magical energy, hidden enchantments, curses, and mana flowing through living beings."
         },
         {
           "id": "spatial-pocket",
           "name": "Spatial Pocket",
-          "cost": 0,
+          "cost": 20,
           "description": "Creates a small personal extradimensional storage space."
         },
         {
           "id": "elemental-transmutation",
           "name": "Elemental Transmutation",
-          "cost": 0,
+          "cost": 20,
           "description": "Converts raw mana into basic elements such as sparks, water, gusts of wind, or stone."
         },
         {
           "id": "shadow-step",
           "name": "Shadow Step",
-          "cost": 0,
+          "cost": 20,
           "description": "Merges into a shadow and emerges from another connected or nearby shadow within line of sight."
         },
         {
           "id": "soul-bound-weapon",
           "name": "Soul-Bound Weapon",
-          "cost": 0,
+          "cost": 15,
           "description": "Binds a mundane weapon to your spirit so it can be summoned and slowly repaired with mana."
         },
         {
           "id": "gravity-nudge",
           "name": "Gravity Nudge",
-          "cost": 0,
+          "cost": 15,
           "description": "Alters local gravity on small objects or yourself for a few seconds, enabling wall-running or projectile deflection."
         },
         {
           "id": "ward-crafting",
           "name": "Ward Crafting",
-          "cost": 0,
+          "cost": 20,
           "description": "Sets invisible perimeters that alert you when crossed, block weak spirits, or dampen sound."
         }
       ]
@@ -755,49 +821,49 @@ window.KARMA_DATA = {
         {
           "id": "danger-sense",
           "name": "Danger Sense",
-          "cost": 0,
+          "cost": 20,
           "description": "Triggers a sharp instinct when targeted, watched with hostile intent, or approaching a trap."
         },
         {
           "id": "luck-manipulation",
           "name": "Luck Manipulation",
-          "cost": 0,
+          "cost": 30,
           "description": "Subtly tilts everyday probabilities in your favor."
         },
         {
           "id": "synergy-link",
           "name": "Synergy Link",
-          "cost": 0,
+          "cost": 20,
           "description": "Physical, mental, and magical abilities passively strengthen one another as you train."
         },
         {
           "id": "skill-copy",
           "name": "Skill Copy",
-          "cost": 0,
+          "cost": 25,
           "description": "Learns the basics of a mundane skill or fighting style after watching someone perform it for a few minutes."
         },
         {
           "id": "karma-ledger",
           "name": "Karma Ledger",
-          "cost": 0,
+          "cost": 20,
           "description": "Tracks moral alignment and hostile intent, showing a subtle aura around people who mean you harm."
         },
         {
           "id": "save-state",
           "name": "Save State",
-          "cost": 0,
-          "description": "Places one mental anchor per day and rewinds you to it within ten seconds if you make a fatal mistake."
+          "cost": 30,
+          "description": "Places one mental anchor per day and rewinds you to it if you make a fatal mistake."
         },
         {
           "id": "item-appraisal",
           "name": "Item Appraisal",
-          "cost": 0,
+          "cost": 10,
           "description": "Displays hidden properties, durability, history, and weaknesses of inspected weapons, artifacts, or machines."
         },
         {
           "id": "familiar-bond",
           "name": "Familiar Bond",
-          "cost": 0,
+          "cost": 15,
           "description": "Forms a telepathic link with a normal animal or small magical creature, sharing senses and helping it grow stronger."
         }
       ]
@@ -811,43 +877,43 @@ window.KARMA_DATA = {
         {
           "id": "honesty-compulsion",
           "name": "Honesty Compulsion",
-          "cost": 0,
+          "cost": 10,
           "description": "You cannot tell a direct lie. You may omit details or phrase things cleverly, but false statements cause sharp headaches."
         },
         {
           "id": "sensory-overload",
           "name": "Sensory Overload",
-          "cost": 0,
+          "cost": 10,
           "description": "Heightened senses cannot be turned down, making crowds, bright lights, and strong smells painful without protection."
         },
         {
           "id": "bounty-target",
           "name": "Bounty Target",
-          "cost": 0,
+          "cost": 20,
           "description": "A powerful local guild, faction, or monster hunter starts with your description and actively tracks you."
         },
         {
           "id": "code-of-honor",
           "name": "Code of Honor",
-          "cost": 0,
+          "cost": 20,
           "description": "You are bound by a strict personal code."
         },
         {
           "id": "technological-bane",
           "name": "Technological Bane",
-          "cost": 0,
+          "cost": 20,
           "description": "Technology fails when you try to work with it."
         },
         {
           "id": "lazy",
           "name": "Lazy",
-          "cost": 0,
+          "cost": 10,
           "description": "You feel persistently lazy."
         },
         {
           "id": "depressed",
           "name": "Depressed",
-          "cost": 0,
+          "cost": 20,
           "description": "You experience a persistent feeling of sadness."
         }
       ]
