@@ -15,7 +15,46 @@ function addDefaultModifiers(content) {
     }));
     return content;
 }
-function loadData() { try { return addDefaultModifiers(JSON.parse(localStorage.getItem("karma-data")) || clone(DEFAULT)) } catch { return clone(DEFAULT) } }
+function migratePatronSections(content) {
+    const oldAlignment = content.sections.find(section => section.id === "patron-alignment");
+    if (oldAlignment?.items.some(item => item.id.startsWith("alignment-"))) return content;
+    const oldPatrons = new Map((oldAlignment?.items || []).map(item => [item.id, item]));
+    const newPatrons = clone(DEFAULT.sections.find(section => section.id === "patron-choices"));
+    newPatrons.items.forEach(item => {
+        const old = oldPatrons.get(item.id);
+        if (old) {
+            item.cost = old.cost;
+            item.description = old.description;
+        }
+    });
+    const alignment = clone(DEFAULT.sections.find(section => section.id === "patron-alignment"));
+    const alignmentIndex = content.sections.findIndex(section => section.id === "patron-alignment");
+    if (alignmentIndex < 0) {
+        const pastIndex = content.sections.findIndex(section => section.id === "karma");
+        content.sections.splice(pastIndex < 0 ? 0 : pastIndex, 0, alignment, newPatrons);
+    } else {
+        content.sections.splice(alignmentIndex, 1, alignment, newPatrons);
+    }
+    content.sections = content.sections.filter((section, index) =>
+        section.id !== "patron-choices" || index === content.sections.findIndex(item => item.id === "patron-choices")
+    );
+    localStorage.setItem("karma-data", JSON.stringify(content));
+    return content;
+}
+function migrateSelectedPatron(selectedItems, oldData) {
+    const patronSection = oldData.sections.find(section => section.id === "patron-alignment");
+    const selectedIds = new Set(selectedItems);
+    patronSection?.items.forEach(item => {
+        if (selectedIds.has(item.id) && item.alignment) selectedIds.add(`alignment-${item.alignment}`);
+    });
+    return selectedIds;
+}
+function loadData() {
+    try {
+        const saved = localStorage.getItem("karma-data");
+        return addDefaultModifiers(saved ? migratePatronSections(JSON.parse(saved)) : clone(DEFAULT));
+    } catch { return clone(DEFAULT) }
+}
 function loadStats() { try { return JSON.parse(localStorage.getItem("karma-stats")) || {} } catch { return {} } }
 function save() {
     localStorage.setItem("karma-data", JSON.stringify(data));
@@ -26,7 +65,94 @@ function save() {
 }
 function escapeHTML(s = "") { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function costLabel(n) { return n > 0 ? `−${n} pts` : n < 0 ? `+${Math.abs(n)} pts` : "Free" }
-function selectedCost() { let n = 0; data.sections.forEach(s => s.items.forEach(i => { if (selected.has(i.id)) n += Number(i.cost) || 0 })); return n }
+function selectedPatron() {
+    const section = data.sections.find(item => item.id === "patron-choices");
+    return section?.items.find(item => selected.has(item.id));
+}
+function selectedAlignment() {
+    const section = data.sections.find(item => item.id === "patron-alignment");
+    return section?.items.find(item => selected.has(item.id));
+}
+function sectionAvailable(section) {
+    const patron = selectedPatron();
+    const alignment = selectedAlignment();
+    if (section.requiresPatron === true && !patron) return false;
+    if (typeof section.requiresPatron === "string" && section.requiresPatron !== patron?.id) return false;
+    if (section.requiresAlignment === true && !alignment) return false;
+    if (typeof section.requiresAlignment === "string" && section.requiresAlignment !== alignment?.alignment) return false;
+    return true;
+}
+function itemAvailable(section, item) {
+    return sectionAvailable(section)
+        && (!item.alignment || item.alignment === selectedAlignment()?.alignment || section.id === "patron-alignment")
+        && (!item.requiresPatron || item.requiresPatron === selectedPatron()?.id);
+}
+function choiceIds(value) {
+    return (Array.isArray(value) ? value : String(value || "").split(","))
+        .map(id => String(id).trim())
+        .filter(Boolean);
+}
+function findChoice(id) {
+    for (const section of data.sections) {
+        const item = section.items.find(choice => choice.id === id);
+        if (item) return { section, item };
+    }
+    return null;
+}
+function choiceDisabledReason(section, item, selectedChoices = selected) {
+    const replacedIds = section.mode === "single"
+        ? new Set(section.items.map(choice => choice.id))
+        : new Set();
+    const availableChoices = new Set([...selectedChoices].filter(id => !replacedIds.has(id)));
+    if (selectedChoices.has(item.id)) availableChoices.add(item.id);
+    const missing = choiceIds(item.requires).filter(id => !availableChoices.has(id));
+    if (missing.length) {
+        const names = missing.map(id => findChoice(id)?.item.name || id);
+        return `Requires: ${names.join(", ")}.`;
+    }
+    const conflicts = new Set(choiceIds(item.incompatibleWith));
+    for (const id of availableChoices) {
+        if (id === item.id) continue;
+        const chosen = findChoice(id);
+        if (conflicts.has(id) || choiceIds(chosen?.item.incompatibleWith).includes(item.id)) {
+            return `Incompatible with ${chosen?.item.name || id}.`;
+        }
+    }
+    return "";
+}
+function sectionVisible(section) {
+    return sectionAvailable(section) || section.id === "patron-loan" || section.id === "patron-missions";
+}
+function clearUnavailableSelections() {
+    data.sections.forEach(section => section.items.forEach(item => {
+        if (selected.has(item.id) && !itemAvailable(section, item)) selected.delete(item.id);
+    }));
+    let changed = true;
+    while (changed) {
+        changed = false;
+        data.sections.forEach(section => section.items.forEach(item => {
+            if (selected.has(item.id) && choiceDisabledReason(section, item)) {
+                selected.delete(item.id);
+                changed = true;
+            }
+        }));
+    }
+}
+function effectiveCost(section, item) {
+    const cost = Number(item.cost) || 0;
+    if (section.id !== "karma") return cost;
+    const alignment = selectedPatron()?.alignment;
+    if (alignment === "evil") return -cost;
+    if (alignment === "good" && cost < 0) return cost * 2;
+    return cost;
+}
+function selectedCost() {
+    let total = 0;
+    data.sections.forEach(section => section.items.forEach(item => {
+        if (selected.has(item.id) && itemAvailable(section, item)) total += effectiveCost(section, item);
+    }));
+    return total;
+}
 function statMultiplier(id) {
     let multiplier = 1;
     data.sections.forEach(section => section.items.forEach(item => {
@@ -55,12 +181,13 @@ function render() {
     $("#selected-count").textContent = selected.size;
     $("#attribute-points").textContent = availableAttributePoints();
     const groups = new Map();
-    data.sections.forEach(sec => {
+    data.sections.filter(sectionVisible).forEach(sec => {
         const title = sec.title || "";
         const group = title.startsWith("Background:") ? ["background", "Background"]
             : title.startsWith("World:") ? ["world", "World"]
             : title.startsWith("Physique:") ? ["physique", "Physique"]
             : title.startsWith("Powers:") ? ["powers", "Powers"]
+            : title.startsWith("Patron:") ? ["patron", "Patron"]
             : title.startsWith("Your Past:") ? ["past", "Your Past"]
             : [sec.id, title];
         if (!groups.has(group[0])) groups.set(group[0], { title: group[1], sections: [] });
@@ -68,24 +195,38 @@ function render() {
     });
     $("#sections").innerHTML = [...groups.entries()].map(([key, group]) => {
         const sections = group.sections.map(sec => {
-            const items = sec.items.filter(i => (i.name + " " + i.description).toLowerCase().includes(q));
-            if (!items.length) return "";
-            const standalone = group.sections.length === 1;
+            if (sec.id === "patron-choices") return "";
+            const items = sec.items.filter(i => itemAvailable(sec, i) && (i.name + " " + i.description).toLowerCase().includes(q));
+            const patronSection = sec.id === "patron-alignment"
+                ? data.sections.find(section => section.id === "patron-choices")
+                : null;
+            const patronItems = patronSection?.items.filter(item =>
+                itemAvailable(patronSection, item) && (item.name + " " + item.description).toLowerCase().includes(q)
+            ) || [];
+            if (!items.length && !patronItems.length && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
+            const standalone = group.sections.length === 1 && key !== "patron";
             const expanded = (standalone ? openGroups.has(key) : openSections.has(sec.id)) || Boolean(q);
-            const selectedCount = sec.items.filter(item => selected.has(item.id)).length;
+            const selectedCount = sec.items.filter(item => itemAvailable(sec, item) && selected.has(item.id)).length;
             const toggleClass = standalone ? "group-toggle standalone-toggle" : "subsection-toggle";
             const toggleData = standalone ? `data-group="${escapeHTML(key)}"` : "";
-            const title = standalone ? group.title : sec.title;
+            const title = standalone ? group.title : sec.title.replace(/^Patron:\s*/, "");
             const randomizer = standalone && key === "background" ? '<button type="button" class="background-randomize" data-randomize-background>Randomize background</button>' : "";
-            return `<section class="section ${standalone ? "" : "subsection"}" id="${escapeHTML(sec.id)}"><button class="section-toggle ${toggleClass}" type="button" ${toggleData} aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(title)}</span><span class="section-toggle-meta">${sec.mode === "single" ? "Choose one" : "Choose any"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}>${randomizer}<p class="desc">${escapeHTML(sec.description || "")}</p><div class="grid">${items.map(item => {
-            const active = selected.has(item.id), cost = Number(item.cost) || 0;
-            return `<article class="card ${active ? "selected" : ""}" data-id="${escapeHTML(item.id)}" role="button" tabindex="0" aria-pressed="${active}"><div class="card-top"><h3>${escapeHTML(item.name)}</h3><span class="cost ${cost > 0 ? "spend" : ""}">${costLabel(cost)}</span></div><p>${escapeHTML(item.description || "No description yet.")}</p><span class="tag">${active ? "Selected" : "Click to select"}</span></article>`;
-        }).join("")}</div></div></section>`;
+            const patronChoices = patronSection && selectedAlignment()
+                ? `<div class="patron-choice-list"><h3>Choose a ${escapeHTML(selectedAlignment().name)} patron</h3><p class="desc">${escapeHTML(patronSection.description || "")}</p><div class="grid">${patronItems.map(item => renderCard(patronSection, item)).join("")}</div></div>`
+                : patronSection ? '<p class="desc">Choose Good, Neutral, or Bad / Evil to see its patrons and perk.</p>' : "";
+            const unavailableMessage = sec.id === "patron-loan" && !selectedPatron()
+                ? "Choose an alignment and patron first to access a loan."
+                : sec.id === "patron-missions" && selectedAlignment()?.alignment !== "neutral"
+                    ? selectedPatron() ? "Missions are only available to Neutral patrons." : "Choose a Neutral alignment and patron to unlock missions."
+                    : "";
+            return `<section class="section ${standalone ? "" : "subsection"}" id="${escapeHTML(sec.id)}"><button class="section-toggle ${toggleClass}" type="button" ${toggleData} aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(title)}</span><span class="section-toggle-meta">${sec.mode === "single" ? "Choose one" : "Choose any"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}>${randomizer}<p class="desc">${escapeHTML(sec.description || "")}</p>${unavailableMessage ? `<p class="desc">${escapeHTML(unavailableMessage)}</p>` : `<div class="grid">${items.map(item => {
+            return renderCard(sec, item);
+        }).join("")}</div>`}${patronChoices}</div></section>`;
         }).filter(Boolean);
         if (!sections.length) return "";
-        if (group.sections.length === 1) return sections.join("");
+        if (group.sections.length === 1 && key !== "patron") return sections.join("");
         const expanded = openGroups.has(key) || Boolean(q);
-        const selectedCount = group.sections.reduce((count, sec) => count + sec.items.filter(item => selected.has(item.id)).length, 0);
+        const selectedCount = group.sections.reduce((count, sec) => count + sec.items.filter(item => itemAvailable(sec, item) && selected.has(item.id)).length, 0);
         const randomizer = key === "background" ? '<button type="button" class="background-randomize" data-randomize-background>Randomize background</button>' : "";
         return `<section class="section group-section"><button class="section-toggle group-toggle" type="button" data-group="${escapeHTML(key)}" aria-expanded="${expanded}" aria-controls="group-content-${escapeHTML(key)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(group.title)}</span>${selectedCount ? `<span class="section-toggle-meta">${selectedCount} selected</span>` : ""}</span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="group-content" id="group-content-${escapeHTML(key)}" ${expanded ? "" : "hidden"}>${randomizer}${sections.join("")}</div></section>`;
     }).join("") || '<div class="empty">No matching choices.</div>';
@@ -94,12 +235,26 @@ function render() {
     $("#stats-chevron").textContent = statsOpen ? "−" : "+";
     renderStats();
 }
+function renderCard(section, item) {
+    const active = selected.has(item.id), cost = effectiveCost(section, item);
+    const reason = choiceDisabledReason(section, item);
+    return `<article class="card ${active ? "selected" : ""} ${reason ? "disabled" : ""}" data-id="${escapeHTML(item.id)}" role="button" tabindex="${reason ? "-1" : "0"}" aria-pressed="${active}" aria-disabled="${Boolean(reason)}"><div class="card-top"><h3>${escapeHTML(item.name)}</h3><span class="cost ${cost > 0 ? "spend" : ""}">${costLabel(cost)}</span></div><p>${escapeHTML(item.description || "No description yet.")}</p><span class="tag">${active ? "Selected" : escapeHTML(reason || "Click to select")}</span></article>`;
+}
 function toggle(id) {
     let sec = data.sections.find(s => s.items.some(i => i.id === id)); if (!sec) return;
-    let item = sec.items.find(i => i.id === id), cost = Number(item.cost) || 0;
-    if (selected.has(id)) { selected.delete(id); render(); return }
+    let item = sec.items.find(i => i.id === id);
+    if (!itemAvailable(sec, item)) return;
+    if (selected.has(id)) {
+        selected.delete(id);
+        clearUnavailableSelections();
+        render();
+        return;
+    }
+    if (choiceDisabledReason(sec, item)) return;
     if (sec.mode === "single") sec.items.forEach(i => selected.delete(i.id));
-    selected.add(id); render();
+    selected.add(id);
+    clearUnavailableSelections();
+    render();
 }
 function renderStats() {
     if (!data.stats) return;
@@ -123,8 +278,70 @@ function renderStats() {
 }
 function exportJSON() { let blob = new Blob([JSON.stringify({ data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold }, null, 2)], { type: "application/json" }); download(blob, "karma-build.json") }
 function download(blob, name) { let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href) }
-function openSummary() { let lines = []; data.sections.forEach(s => s.items.forEach(i => { if (selected.has(i.id)) lines.push(`<li>${escapeHTML(s.title)} — ${escapeHTML(i.name)} <span class="muted">(${costLabel(Number(i.cost) || 0)})</span></li>`) })); $("#summary-content").innerHTML = lines.length ? `<ul>${lines.join("")}</ul>` : "<p>No choices selected yet.</p>"; $("#summary-modal").classList.add("open") }
-function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { data = addDefaultModifiers(obj.data); selected = new Set(obj.selected || []); points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0 } else { data = addDefaultModifiers(obj); selected.clear() } save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
+function selectedChoices() {
+    return data.sections.flatMap(section => section.items
+        .filter(item => selected.has(item.id) && itemAvailable(section, item))
+        .map(item => ({ section, item })));
+}
+function renderSummary() {
+    const choices = selectedChoices();
+    $("#summary-content").innerHTML = choices.length
+        ? `<ul class="summary-choice-list">${choices.map(({ section, item }) => `<li><details><summary>${escapeHTML(section.title)} — ${escapeHTML(item.name)} <span class="muted">(${costLabel(effectiveCost(section, item))})</span></summary><p>${escapeHTML(item.description || "No description provided.")}</p></details></li>`).join("")}</ul>`
+        : "<p>No choices selected yet.</p>";
+    const separator = $("#separate-choice-rows").checked ? "\n" : ", ";
+    $("#choice-titles").value = choices.map(({ item }) => item.name).join(separator);
+    $("#choice-ids").value = choices.map(({ item }) => item.id).join(separator);
+}
+function openSummary() {
+    renderSummary();
+    $("#choice-import-status").textContent = "";
+    $("#summary-modal").classList.add("open");
+}
+function importChoiceIds() {
+    const ids = $("#choice-import").value.split(/[,\s]+/).filter(Boolean);
+    if (!ids.length) {
+        selected.clear();
+        clearUnavailableSelections();
+        save();
+        render();
+        renderSummary();
+        $("#choice-import-status").textContent = "Selections cleared.";
+        return;
+    }
+    const requested = new Set(ids);
+    const unknown = ids.filter(id => !findChoice(id));
+    if (unknown.length) {
+        $("#choice-import-status").textContent = `Unknown choice ID${unknown.length === 1 ? "" : "s"}: ${unknown.join(", ")}`;
+        return;
+    }
+    const previous = selected;
+    selected = requested;
+    let reason = "";
+    for (const { section, item } of selectedChoices()) {
+        const duplicate = section.mode === "single" && section.items.filter(choice => selected.has(choice.id)).length > 1;
+        if (duplicate) {
+            reason = `Choose only one option in "${section.title}".`;
+            break;
+        }
+        reason = choiceDisabledReason(section, item);
+        if (reason) {
+            reason = `${item.name}: ${reason}`;
+            break;
+        }
+    }
+    if (selectedChoices().length !== requested.size && !reason) reason = "One or more choices are unavailable.";
+    if (reason) {
+        selected = previous;
+        $("#choice-import-status").textContent = reason;
+        return;
+    }
+    clearUnavailableSelections();
+    save();
+    render();
+    renderSummary();
+    $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} imported.`;
+}
+function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = addDefaultModifiers(migratePatronSections(obj.data)); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0 } else { data = addDefaultModifiers(migratePatronSections(obj)); selected.clear() } clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
 document.addEventListener("click", e => {
     const card = e.target.closest(".card[data-id]"); if (card) toggle(card.dataset.id);
     if (e.target.closest("[data-randomize-background]")) {
@@ -135,6 +352,7 @@ document.addEventListener("click", e => {
             }
         });
         save();
+        clearUnavailableSelections();
         render();
         return;
     }
@@ -171,6 +389,21 @@ document.addEventListener("click", e => {
     if (e.target.closest("#reset")) { if (confirm("Reset selections, stat allocations, and bought or sold attribute points? Spent karma will not be refunded.")) { selected.clear(); stats = {}; attributePointsBought = 0; attributePointsSold = 0; save(); render() } }
     if (e.target.closest("#summary")) openSummary();
     if (e.target.closest("#close-summary")) $("#summary-modal").classList.remove("open");
+    if (e.target.id === "summary-modal") e.target.classList.remove("open");
+    if (e.target.closest("#import-choices")) importChoiceIds();
+    const copyButton = e.target.closest("[data-copy-output]");
+    if (copyButton) {
+        const output = document.getElementById(copyButton.dataset.copyOutput);
+        output.select();
+        if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(output.value).then(
+                () => { $("#choice-import-status").textContent = "Copied to clipboard."; },
+                () => { $("#choice-import-status").textContent = "Copy was blocked. Select and copy the text manually."; }
+            );
+        } else {
+            $("#choice-import-status").textContent = "Select and copy the text manually.";
+        }
+    }
     if (e.target.closest("#export")) exportJSON();
     if (e.target.closest("#edit-content")) location.href = "editor.html";
 });
@@ -202,6 +435,7 @@ document.addEventListener("change", e => {
 });
 document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches(".card[data-id]")) { e.preventDefault(); toggle(e.target.dataset.id) } });
 document.addEventListener("input", e => { if (e.target.id === "search") render() });
+document.addEventListener("change", e => { if (e.target.id === "separate-choice-rows") renderSummary() });
 $("#import").addEventListener("change", e => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = "" });
 $("#save-build").addEventListener("click", () => { save(); let build = { data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold }; download(new Blob([JSON.stringify(build, null, 2)], { type: "application/json" }), "karma-build.json"); });
 render();

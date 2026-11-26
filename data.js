@@ -13,6 +13,407 @@ window.KARMA_DATA = {
   ],
   "sections": [
     {
+      "id": "patron-alignment",
+      "title": "Patron: Alignment",
+      "description": "Choose an alignment to learn what its patrons offer, then choose one patron whose story you want to live.",
+      "mode": "single",
+      "items": [
+        {
+          "id": "alignment-good",
+          "name": "Good",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Good patrons double the karma you gained from your past. they expect the best of you."
+        },
+        {
+          "id": "alignment-neutral",
+          "name": "Neutral",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Neutral patrons leave your past karma unchanged and offer missions for extra points. They want to make a deal with you."
+        },
+        {
+          "id": "alignment-evil",
+          "name": "Bad / Evil",
+          "alignment": "evil",
+          "cost": 0,
+          "description": "Evil patrons flip the karma effect of your past: good karma decreases your points, while evil karma increases them. They expect entertainment."
+        },
+      ]
+    },
+    {
+      "id": "patron-choices",
+      "title": "Patron: Choose a Patron",
+      "description": "Choose the patron whose preferred story will shape your next life.",
+      "mode": "single",
+      "requiresAlignment": true,
+      "items": [
+        {
+          "id": "patron-keeper-eternal-hearth",
+          "name": "The Keeper of the Eternal Hearth",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Wants to see familial warmth. Protect what you call home, whatever form it takes."
+        },
+        {
+          "id": "patron-arbiter-radiant-scale",
+          "name": "The Arbiter of the Radiant Scale",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Wants to see righteous judgment. Fight for what is right, by your own measure."
+        },
+        {
+          "id": "patron-hero-distant-horizon",
+          "name": "The Hero of Distant Horizon",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Wants to see grand adventure. Witness the wonders of the world on his behalf."
+        },
+        {
+          "id": "patron-mercy-gentle-hand",
+          "name": "The Mercy of Gentle Hand",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Wants to see redemption and grace. Save someone important, from danger or from themselves."
+        },
+        {
+          "id": "patron-herald-first-light",
+          "name": "The Herald of the First Light",
+          "alignment": "good",
+          "cost": 0,
+          "description": "Wants to see hope endure. Bring witness to the warmth that survives in the dark."
+        },
+        {
+          "id": "patron-warden-balance",
+          "name": "The Warden of Balance",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see equilibrium maintained. Tip the scales whenever one side grows too loud."
+        },
+        {
+          "id": "patron-judge-karmic-ledger",
+          "name": "The Judge of the Karmic Ledger",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see consequences collected. Hunt those who renege on their debts, literal or moral."
+        },
+        {
+          "id": "patron-jester-whimsy-jeer",
+          "name": "The Jester of the Whimsy Jeer",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see absurdist comedy. Bring chaotic joy and unravel the plans of the overly serious."
+        },
+        {
+          "id": "patron-archivist-forgotten",
+          "name": "The Archivist of the Forgotten",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see lost mysteries uncovered. Explore obscure places and ensure nothing truly dies unremembered."
+        },
+        {
+          "id": "patron-pilgrim-endless-roads",
+          "name": "The Pilgrim of Endless Roads",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see wandering drama. Search for someone or something elusive across the world."
+        },
+        {
+          "id": "patron-phantom-sunken-crown",
+          "name": "The Phantom of the Sunken Crown",
+          "alignment": "neutral",
+          "cost": 0,
+          "description": "Wants to see an audacious heist. Claim what others believe is untouchable."
+        },
+        {
+          "id": "patron-butcher-fourth-dimension",
+          "name": "The Butcher of the 4th Dimension",
+          "alignment": "evil",
+          "cost": 0,
+          "description": "Wants to see visceral carnage. Carve a bloody legend and eliminate a worthy hero."
+        },
+        {
+          "id": "patron-betrayer-never-sate",
+          "name": "The Betrayer of the Never Sate",
+          "alignment": "evil",
+          "cost": 0,
+          "description": "Wants to see creeping corruption. Spread his cult and twist devotion into obsession."
+        },
+        {
+          "id": "patron-usurper-light",
+          "name": "The Usurper of the Light",
+          "alignment": "evil",
+          "cost": 0,
+          "description": "Wants to see the fall of the pure. Shatter idols and destroy those who lean toward the light."
+        },
+        {
+          "id": "patron-agony-envy",
+          "name": "The Agony of Envy",
+          "alignment": "evil",
+          "cost": 0,
+          "description": "Wants to see bitter tragedy. Break the happiness of the fortunate and turn joy into ruin."
+        }
+      ]
+    },
+    {
+      "id": "patron-loan",
+      "title": "Patron: Loan",
+      "description": "A loan is your patron's investment in the story they want to see. Taking one lets them nudge your fate toward their preferred genre; the larger the loan, the stronger the narrative pull. Choose one amount.",
+      "mode": "single",
+      "requiresPatron": true,
+      "items": [
+        {
+          "id": "patron-loan-10",
+          "name": "Small Investment",
+          "cost": -10,
+          "description": "10 points. A small coincidence may put a fitting opportunity in your path."
+        },
+        {
+          "id": "patron-loan-20",
+          "name": "Modest Investment",
+          "cost": -20,
+          "description": "20 points. Your patron's preferred themes begin to shape meaningful encounters."
+        },
+        {
+          "id": "patron-loan-40",
+          "name": "Substantial Investment",
+          "cost": -40,
+          "description": "40 points. Your fate is noticeably steered toward the life your patron wants to witness."
+        },
+        {
+          "id": "patron-loan-80",
+          "name": "Major Investment",
+          "cost": -80,
+          "description": "80 points. Your patron can strongly nudge your life toward their chosen genre."
+        },
+        {
+          "id": "patron-loan-100",
+          "name": "Grand Investment",
+          "cost": -100,
+          "description": "100 points. Your patron's preferred story becomes a defining force in your life."
+        }
+      ]
+    },
+    {
+      "id": "patron-missions",
+      "title": "Patron: Missions",
+      "description": "Neutral patrons offer missions that reward you for advancing the story they want to see. You may select any missions offered by your chosen Neutral patron.",
+      "mode": "multiple",
+      "requiresAlignment": "neutral",
+      "items": [
+        {
+          "id": "mission-warden-tip-the-scale",
+          "requiresPatron": "patron-warden-balance",
+          "name": "Tip the Scale",
+          "cost": -10,
+          "description": "Find an unfair struggle where the weak are being crushed by the strong, and secretly give the underdog just enough of an edge to make it a fair fight."
+        },
+        {
+          "id": "mission-warden-razors-edge",
+          "requiresPatron": "patron-warden-balance",
+          "name": "The Razor's Edge",
+          "cost": -10,
+          "description": "Step between two bitter rivals locked in a cycle of escalation and manipulate events so neither can ever completely destroy the other."
+        },
+        {
+          "id": "mission-warden-topple-giant",
+          "requiresPatron": "patron-warden-balance",
+          "name": "Topple the Giant",
+          "cost": -20,
+          "description": "Rise within your world's dominant, unchecked power and pull the thread that brings its arrogance crashing down."
+        },
+        {
+          "id": "mission-warden-forced-harmony",
+          "requiresPatron": "patron-warden-balance",
+          "name": "Forced Harmony",
+          "cost": -20,
+          "description": "Trap two mortal enemies in a crisis where neither can survive unless they learn to rely on each other."
+        },
+        {
+          "id": "mission-warden-eternal-equilibrium",
+          "requiresPatron": "patron-warden-balance",
+          "name": "Eternal Equilibrium",
+          "cost": -40,
+          "description": "Fundamentally alter the ruling order of your world so no single force, faction, or ideology can ever achieve absolute dominance again."
+        },
+        {
+          "id": "mission-judge-collect-what-is-owed",
+          "requiresPatron": "patron-judge-karmic-ledger",
+          "name": "Collect What Is Owed",
+          "cost": -10,
+          "description": "Track down someone who cheated another out of something precious, and corner them until they willingly return what they stole."
+        },
+        {
+          "id": "mission-judge-mirror-of-irony",
+          "requiresPatron": "patron-judge-karmic-ledger",
+          "name": "The Mirror of Irony",
+          "cost": -10,
+          "description": "Engineer a twist of fate where a cruel or hypocritical figure suffers the exact misfortune they inflicted on others."
+        },
+        {
+          "id": "mission-judge-long-reckoning",
+          "requiresPatron": "patron-judge-karmic-ledger",
+          "name": "The Long Reckoning",
+          "cost": -20,
+          "description": "Spend years weaving a quiet web around an untouchable wrongdoer, dismantling their life piece by piece before revealing why."
+        },
+        {
+          "id": "mission-judge-no-escape",
+          "requiresPatron": "patron-judge-karmic-ledger",
+          "name": "No Escape from the Past",
+          "cost": -20,
+          "description": "Hunt down a legendary figure or monster who abandoned their sins to live in peace, and bring their unfinished debts to their doorstep."
+        },
+        {
+          "id": "mission-judge-judgment-of-world",
+          "requiresPatron": "patron-judge-karmic-ledger",
+          "name": "Judgment of the World",
+          "cost": -40,
+          "description": "Expose the buried crimes of your world's highest authority before everyone they rule, forcing a historic reckoning."
+        },
+        {
+          "id": "mission-jester-ruin-the-moment",
+          "requiresPatron": "patron-jester-whimsy-jeer",
+          "name": "Ruin the Moment",
+          "cost": -10,
+          "description": "Hijack a deadly serious, high-stakes gathering and derail it into such an absurd comedy of errors that everyone forgets why they cared."
+        },
+        {
+          "id": "mission-jester-phantom-threat",
+          "requiresPatron": "patron-jester-whimsy-jeer",
+          "name": "The Phantom Threat",
+          "cost": -10,
+          "description": "Convince a notoriously rigid, humorless authority that a completely fabricated, ridiculous omen or rule is of utmost importance, and watch them dance to it."
+        },
+        {
+          "id": "mission-jester-grand-bluff",
+          "requiresPatron": "patron-jester-whimsy-jeer",
+          "name": "The Grand Bluff",
+          "cost": -20,
+          "description": "Blag your way into a position of immense prestige or expertise you are wholly unqualified for, surviving on theatrical confidence and sheer luck."
+        },
+        {
+          "id": "mission-jester-accidental-legend",
+          "requiresPatron": "patron-jester-whimsy-jeer",
+          "name": "The Accidental Legend",
+          "cost": -20,
+          "description": "Start a nonsensical rumor, trend, or belief as a private joke, only for it to spiral into a massive movement."
+        },
+        {
+          "id": "mission-jester-ultimate-punchline",
+          "requiresPatron": "patron-jester-whimsy-jeer",
+          "name": "The Ultimate Punchline",
+          "cost": -40,
+          "description": "Resolve your world's greatest crisis, war, or existential threat in the most anticlimactic, absurd way imaginable, turning epic tragedy into a timeless joke."
+        },
+        {
+          "id": "mission-archivist-unfinished-words",
+          "requiresPatron": "patron-archivist-forgotten",
+          "name": "Unfinished Words",
+          "cost": -10,
+          "description": "Discover the last trace of someone forgotten—a lost message, dying wish, or fading memory—and see their final intent through to the end."
+        },
+        {
+          "id": "mission-archivist-off-the-chart",
+          "requiresPatron": "patron-archivist-forgotten",
+          "name": "Off the Chart",
+          "cost": -10,
+          "description": "Venture into a place the world has abandoned or erased from memory, and record the truth of what still lingers there."
+        },
+        {
+          "id": "mission-archivist-dying-flame",
+          "requiresPatron": "patron-archivist-forgotten",
+          "name": "The Dying Flame",
+          "cost": -20,
+          "description": "Find the last living keeper of a vanishing art, lost truth, or forbidden knowledge, earn their trust, and ensure it survives into the next age."
+        },
+        {
+          "id": "mission-archivist-rewrite-the-lie",
+          "requiresPatron": "patron-archivist-forgotten",
+          "name": "Rewrite the Lie",
+          "cost": -20,
+          "description": "Uncover the buried truth behind a celebrated victory or beloved hero, prove history remembered the wrong side, and bring the truth to light."
+        },
+        {
+          "id": "mission-archivist-origin-secret",
+          "requiresPatron": "patron-archivist-forgotten",
+          "name": "The Origin Secret",
+          "cost": -40,
+          "description": "Uncover the foundational, intentionally erased mystery of your world's creation or history, and force everyone to confront what was hidden."
+        },
+        {
+          "id": "mission-pilgrim-long-delivery",
+          "requiresPatron": "patron-pilgrim-endless-roads",
+          "name": "The Long Delivery",
+          "cost": -10,
+          "description": "Carry a meaningful keepsake or message across unfamiliar lands to someone whose name is the only clue you possess."
+        },
+        {
+          "id": "mission-pilgrim-passing-through",
+          "requiresPatron": "patron-pilgrim-endless-roads",
+          "name": "Passing Through",
+          "cost": -10,
+          "description": "Leave behind everything familiar and drift from place to place, leaving a brief, unforgettable mark on dozens of lives before vanishing again."
+        },
+        {
+          "id": "mission-pilgrim-chasing-shadow",
+          "requiresPatron": "patron-pilgrim-endless-roads",
+          "name": "Chasing a Shadow",
+          "cost": -20,
+          "description": "Spend years following rumors and fleeting encounters to track down an elusive wanderer, lost bond, or mythical figure always one step ahead."
+        },
+        {
+          "id": "mission-pilgrim-crossroads",
+          "requiresPatron": "patron-pilgrim-endless-roads",
+          "name": "The Crossroads",
+          "cost": -20,
+          "description": "Establish a neutral haven at the edge of nowhere where outcasts, travelers, and enemies must lay down their conflict and share their stories."
+        },
+        {
+          "id": "mission-pilgrim-beyond-edge",
+          "requiresPatron": "patron-pilgrim-endless-roads",
+          "name": "Beyond the Edge",
+          "cost": -40,
+          "description": "Cross the impassable boundary separating the known from the unknown, and become the first to stand on the other side."
+        },
+        {
+          "id": "mission-phantom-calling-card",
+          "requiresPatron": "patron-phantom-sunken-crown",
+          "name": "The Calling Card",
+          "cost": -10,
+          "description": "Slip past the defenses of someone who believes themselves untouchable, take their most prized possession, and leave proof you were there."
+        },
+        {
+          "id": "mission-phantom-reverse-theft",
+          "requiresPatron": "patron-phantom-sunken-crown",
+          "name": "The Reverse Theft",
+          "cost": -10,
+          "description": "Infiltrate the most fiercely guarded place you can find—not to take anything out, but to leave something behind that changes everything when discovered."
+        },
+        {
+          "id": "mission-phantom-stolen-skin",
+          "requiresPatron": "patron-phantom-sunken-crown",
+          "name": "Stolen Skin",
+          "cost": -20,
+          "description": "Claim someone else's entire identity, living their life and fooling those closest to them for years without anyone realizing the truth."
+        },
+        {
+          "id": "mission-phantom-clockwork-job",
+          "requiresPatron": "patron-phantom-sunken-crown",
+          "name": "The Clockwork Job",
+          "cost": -20,
+          "description": "Gather specialists for an impossible infiltration against an impenetrable target, improvising your way out when the plan goes sideways."
+        },
+        {
+          "id": "mission-phantom-steal-impossible",
+          "requiresPatron": "patron-phantom-sunken-crown",
+          "name": "Steal the Impossible",
+          "cost": -40,
+          "description": "Claim something your world believes cannot be stolen—an abstract right, cosmic power, collective memory, or supreme symbol of authority."
+        }
+      ]
+    },
+    {
       "id": "karma",
       "title": "Your Past: Karma Tier",
       "description": "Choose the tier that best represents the outcomes of your previous life. The source also allows manual point adjustments.",
@@ -877,43 +1278,43 @@ window.KARMA_DATA = {
         {
           "id": "honesty-compulsion",
           "name": "Honesty Compulsion",
-          "cost": 10,
+          "cost": -10,
           "description": "You cannot tell a direct lie. You may omit details or phrase things cleverly, but false statements cause sharp headaches."
         },
         {
           "id": "sensory-overload",
           "name": "Sensory Overload",
-          "cost": 10,
+          "cost": -10,
           "description": "Heightened senses cannot be turned down, making crowds, bright lights, and strong smells painful without protection."
         },
         {
           "id": "bounty-target",
           "name": "Bounty Target",
-          "cost": 20,
+          "cost": -20,
           "description": "A powerful local guild, faction, or monster hunter starts with your description and actively tracks you."
         },
         {
           "id": "code-of-honor",
           "name": "Code of Honor",
-          "cost": 20,
+          "cost": -20,
           "description": "You are bound by a strict personal code."
         },
         {
           "id": "technological-bane",
           "name": "Technological Bane",
-          "cost": 20,
+          "cost": -20,
           "description": "Technology fails when you try to work with it."
         },
         {
           "id": "lazy",
           "name": "Lazy",
-          "cost": 10,
+          "cost": -10,
           "description": "You feel persistently lazy."
         },
         {
           "id": "depressed",
           "name": "Depressed",
-          "cost": 20,
+          "cost": -20,
           "description": "You experience a persistent feeling of sadness."
         }
       ]
@@ -921,7 +1322,7 @@ window.KARMA_DATA = {
   ],
   "stats": {
     "starting": 30,
-    "description": "Allocate your default 30 stat points. One karma point buys one stat point. The source describes an average stat as 5 and 10 as a super-genius level; above 10 is beyond genius.",
+    "description": "Allocate points, your default starts at 30 stat points. One karma point buys one stat point. average stat is 5 and 10 is a super-genius level, above 10 is beyond genius. these Attributes represents your potential and what you can achieve by doing nothing special but doing something special like training allows you to reach it faster.",
     "attributes": [
 
       {
