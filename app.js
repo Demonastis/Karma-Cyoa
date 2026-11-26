@@ -383,18 +383,32 @@ function renderSummary() {
         if (!grouped.has("Appearance Maxing")) grouped.set("Appearance Maxing", []);
         grouped.get("Appearance Maxing").push({ ethnicity: appearanceEthnicity.trim() });
     }
+    const attributeEntries = (data.stats?.attributes || []).map(attribute => {
+        const allocated = Math.max(0, Number(stats[attribute.id]) || 0);
+        const multiplier = statMultiplier(attribute.id);
+        const finalValue = allocated * multiplier;
+        const finalLabel = multiplier !== 1 ? ` · final ${formatStat(finalValue)}` : "";
+        return `<li><strong>${escapeHTML(attribute.name)}:</strong> ${allocated} allocated${finalLabel}${showDescriptions ? `<p>${escapeHTML(attribute.description || "")}</p>` : ""}</li>`;
+    });
     $("#summary-content").innerHTML = grouped.size
         ? `<div class="summary-sections">${[...grouped].map(([title, entries]) => `<section class="summary-section"><h3>${escapeHTML(title)}</h3><ul>${entries.map(entry => {
             if (entry.ethnicity) return `<li><strong>Ethnicity:</strong> ${escapeHTML(entry.ethnicity)}</li>`;
             const { section, item } = entry;
             return `<li><strong>${escapeHTML(item.name)}</strong> <span class="muted">(${costLabel(effectiveCost(section, item))})</span>${showDescriptions ? `<p>${escapeHTML(item.description || "No description provided.")}</p>` : ""}</li>`;
-        }).join("")}</ul></section>`).join("")}</div>`
-        : "<p>No choices selected yet.</p>";
+        }).join("")}</ul></section>`).join("")}${attributeEntries.length ? `<section class="summary-section"><h3>Attributes</h3><ul>${attributeEntries.join("")}</ul></section>` : ""}</div>`
+        : attributeEntries.length
+            ? `<div class="summary-sections"><section class="summary-section"><h3>Attributes</h3><ul>${attributeEntries.join("")}</ul></section></div>`
+            : "<p>No choices selected yet.</p>";
     const separator = $("#separate-choice-rows").checked ? "\n" : ", ";
     const titles = choices.map(({ item }) => item.name);
     if (appearanceEthnicity.trim()) titles.unshift(`Ethnicity: ${appearanceEthnicity.trim()}`);
+    const attributeIds = (data.stats?.attributes || []).map(attribute => {
+        const allocated = Math.max(0, Number(stats[attribute.id]) || 0);
+        titles.push(`${attribute.name}: ${allocated} allocated`);
+        return `stat:${attribute.id}=${allocated}`;
+    });
     $("#choice-titles").value = titles.join(separator);
-    $("#choice-ids").value = choices.map(({ item }) => item.id).join(separator);
+    $("#choice-ids").value = [...choices.map(({ item }) => item.id), ...attributeIds].join(separator);
 }
 function openSummary() {
     renderSummary();
@@ -402,8 +416,8 @@ function openSummary() {
     $("#summary-modal").classList.add("open");
 }
 function importChoiceIds() {
-    const ids = $("#choice-import").value.split(/[,\s]+/).filter(Boolean);
-    if (!ids.length) {
+    const tokens = $("#choice-import").value.split(/[,\s]+/).filter(Boolean);
+    if (!tokens.length) {
         selected.clear();
         clearUnavailableSelections();
         save();
@@ -412,16 +426,54 @@ function importChoiceIds() {
         $("#choice-import-status").textContent = "Selections cleared.";
         return;
     }
-    const requested = new Set(ids);
-    const unknown = ids.filter(id => !findChoice(id));
+    const requested = new Set();
+    const importedStats = {};
+    let hasStats = false;
+    const errors = [];
+    tokens.forEach(token => {
+        const statToken = token.match(/^stat:([a-zA-Z0-9_-]+)=(\d+)$/);
+        if (statToken) {
+            const [, id, value] = statToken;
+            if (!data.stats?.attributes.some(attribute => attribute.id === id)) errors.push(`Unknown attribute: ${id}`);
+            else {
+                importedStats[id] = Number(value);
+                hasStats = true;
+            }
+        } else if (token.startsWith("stat:")) {
+            errors.push(`Invalid attribute allocation: ${token}`);
+        } else {
+            requested.add(token);
+        }
+    });
+    if (errors.length) {
+        $("#choice-import-status").textContent = errors.join("; ");
+        return;
+    }
+    const unknown = [...requested].filter(id => !findChoice(id));
     if (unknown.length) {
         $("#choice-import-status").textContent = `Unknown choice ID${unknown.length === 1 ? "" : "s"}: ${unknown.join(", ")}`;
         return;
     }
-    const previous = selected;
+    const previous = selected, previousStats = stats;
     selected = requested;
+    if (hasStats) {
+        stats = Object.fromEntries(data.stats.attributes.map(attribute => [
+            attribute.id,
+            importedStats[attribute.id] ?? 0
+        ]));
+    }
     let reason = "";
+    if (hasStats) {
+        const constitution = Number(stats.constitution) || 0;
+        for (const attribute of data.stats.attributes) {
+            if (attribute.id !== "constitution" && (Number(stats[attribute.id]) || 0) > constitution * statMultiplier("constitution") * 2) {
+                reason = `${attribute.name} exceeds the limit set by Constitution.`;
+                break;
+            }
+        }
+    }
     for (const { section, item } of selectedChoices()) {
+        if (reason) break;
         const duplicate = section.mode === "single" && section.items.filter(choice => selected.has(choice.id)).length > 1;
         if (duplicate) {
             reason = `Choose only one option in "${section.title}".`;
@@ -436,6 +488,7 @@ function importChoiceIds() {
     if (selectedChoices().length !== requested.size && !reason) reason = "One or more choices are unavailable.";
     if (reason) {
         selected = previous;
+        stats = previousStats;
         $("#choice-import-status").textContent = reason;
         return;
     }
@@ -443,7 +496,7 @@ function importChoiceIds() {
     save();
     render();
     renderSummary();
-    $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} imported.`;
+    $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} and ${hasStats ? "attribute allocations" : "no attribute allocations"} imported.`;
 }
 function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = addDefaultModifiers(migratePatronSections(obj.data)); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = addDefaultModifiers(migratePatronSections(obj)); selected.clear(); appearanceEthnicity = "" } clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
 document.addEventListener("click", e => {
