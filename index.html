@@ -100,11 +100,11 @@
                 <label class="summary-option"><input id="separate-choice-rows" type="checkbox"> Separate choice titles by row</label>
                 <div class="summary-output-grid">
                     <label>Current activated choice titles<textarea id="choice-titles" readonly rows="5"></textarea><button type="button" data-copy-output="choice-titles">Copy titles</button></label>
-                    <label>Current activated choice IDs<textarea id="choice-ids" readonly rows="5"></textarea><button type="button" data-copy-output="choice-ids">Copy IDs</button></label>
+                    <label>Current choice IDs and attribute allocations<textarea id="choice-ids" readonly rows="5"></textarea><button type="button" data-copy-output="choice-ids">Copy build IDs</button></label>
                 </div>
-                <label>Import activated choices with a list of IDs<textarea id="choice-import" rows="4" placeholder="Paste choice IDs separated by commas, spaces, or new lines. Leave empty to clear selections."></textarea></label>
+                <label>Import build choices and attributes<textarea id="choice-import" rows="4" placeholder="Paste choice IDs and stat allocations (for example, stat:constitution=5) separated by commas, spaces, or new lines. Leave empty to clear choices."></textarea></label>
                 <div class="summary-import-actions">
-                    <button type="button" class="primary" id="import-choices">Import choices / clear if empty</button>
+                    <button type="button" class="primary" id="import-choices">Import build / clear choices if empty</button>
                     <span class="muted small" id="choice-import-status" role="status"></span>
                 </div>
             </section>
