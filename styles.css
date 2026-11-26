@@ -346,6 +346,18 @@ textarea {
   background: var(--panel);
 }
 
+.alignment-option {
+  margin: 14px 0;
+}
+
+.alignment-accordion-toggle {
+  background: var(--panel2);
+}
+
+.alignment-accordion-content {
+  padding: 10px 0 0;
+}
+
 .section-toggle-main {
   display: flex;
   flex-direction: column;
@@ -476,6 +488,59 @@ details {
   box-shadow: var(--shadow);
 }
 
+.guide-comments {
+  padding: 0;
+  overflow: hidden;
+}
+
+.guide-comments > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  list-style: none;
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(110deg, var(--panel2), var(--panel));
+  cursor: pointer;
+}
+
+.guide-comments > summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-comments > summary::after {
+  content: "+";
+  color: var(--accent2);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.guide-comments[open] > summary::after {
+  content: "−";
+}
+
+.guide-comments-meta {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.guide-comments-content {
+  padding: 6px 18px 18px;
+}
+
+.guide-comments-content h3 {
+  margin: 22px 0 8px;
+  color: var(--accent2);
+}
+
+.guide-comments-content p:last-child {
+  margin-bottom: 0;
+}
+
 summary {
   cursor: pointer;
   font-weight: 800;
@@ -485,6 +550,78 @@ summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 14px;
+}
+
+.appearance-builder {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.appearance-maxing {
+  margin: 20px 0;
+}
+
+.appearance-maxing-toggle {
+  background: linear-gradient(110deg, var(--panel2), var(--panel));
+  border-color: var(--accent);
+}
+
+.appearance-maxing-toggle .section-toggle-title {
+  font-size: 1.35rem;
+}
+
+.appearance-maxing-content {
+  padding: 0 16px 16px;
+}
+
+.appearance-randomize {
+  margin: 0 0 12px;
+}
+
+.appearance-ethnicity {
+  margin-bottom: 18px;
+}
+
+.appearance-ethnicity label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 800;
+}
+
+.appearance-ethnicity .desc {
+  margin: 0 0 8px;
+}
+
+.appearance-ethnicity textarea {
+  width: 100%;
+  min-height: 76px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: #120e24;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
+.appearance-accordion {
+  margin: 14px 0;
+  padding: 0;
+  background: transparent;
+}
+
+.appearance-accordion-content {
+  padding: 8px 2px 0;
+}
+
+.appearance-accordion-content .appearance-subtitle {
+  margin: 16px 0 8px;
+  color: var(--accent2);
+}
+
+.appearance-accordion-content > .desc {
+  margin: 0 0 12px;
 }
 
 .stat-box {
@@ -644,21 +781,35 @@ summary {
   color: var(--accent2);
 }
 
-.summary-choice-list {
+.summary-sections {
+  display: grid;
+  gap: 14px;
+}
+
+.summary-section {
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.summary-section h3 {
+  margin: 0 0 8px;
+  color: var(--accent2);
+}
+
+.summary-section ul {
+  margin: 0;
   padding-left: 22px;
 }
 
-.summary-choice-list li {
+.summary-section li {
   margin: 8px 0;
 }
 
-.summary-choice-list details > summary {
-  cursor: pointer;
-  color: var(--text);
-}
-
-.summary-choice-list details p {
-  margin: 8px 0;
+.summary-section li p {
+  margin: 5px 0 0;
+  color: var(--muted);
 }
 
 .summary-build-form {

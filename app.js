@@ -5,6 +5,7 @@ const DEFAULT = clone(window.KARMA_DATA);
 let data = loadData(), selected = new Set(), points = Number(localStorage.getItem("karma-points") ?? 0);
 let stats = loadStats(), attributePointsBought = Number(localStorage.getItem("karma-attribute-points-bought") ?? 0);
 let attributePointsSold = Number(localStorage.getItem("karma-attribute-points-sold") ?? 0);
+let appearanceEthnicity = localStorage.getItem("karma-appearance-ethnicity") || "";
 const openGroups = new Set(), openSections = new Set();
 let statsOpen = false;
 function addDefaultModifiers(content) {
@@ -13,6 +14,14 @@ function addDefaultModifiers(content) {
         const source = defaultItems.get(item.id);
         if (item.modifiers === undefined && source?.modifiers) item.modifiers = clone(source.modifiers);
     }));
+    const sectionIds = new Set(content.sections?.map(section => section.id));
+    DEFAULT.sections.filter(section => section.id.startsWith("appearance-") && !sectionIds.has(section.id))
+        .forEach(section => content.sections.push(clone(section)));
+    const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
+    if (ethnicity) {
+        ethnicity.items = [];
+        ethnicity.description = DEFAULT.sections.find(section => section.id === "appearance-ethnicity").description;
+    }
     return content;
 }
 function migratePatronSections(content) {
@@ -62,6 +71,7 @@ function save() {
     localStorage.setItem("karma-stats", JSON.stringify(stats));
     localStorage.setItem("karma-attribute-points-bought", String(attributePointsBought));
     localStorage.setItem("karma-attribute-points-sold", String(attributePointsSold));
+    localStorage.setItem("karma-appearance-ethnicity", appearanceEthnicity);
 }
 function escapeHTML(s = "") { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function costLabel(n) { return n > 0 ? `−${n} pts` : n < 0 ? `+${Math.abs(n)} pts` : "Free" }
@@ -100,6 +110,13 @@ function findChoice(id) {
     return null;
 }
 function choiceDisabledReason(section, item, selectedChoices = selected) {
+    const unmetStat = Object.entries(item.requiresStats || {}).find(([id, minimum]) =>
+        (Number(stats[id]) || 0) < Number(minimum)
+    );
+    if (unmetStat) {
+        const attribute = data.stats?.attributes.find(entry => entry.id === unmetStat[0]);
+        return `Requires ${Number(unmetStat[1])} or more ${attribute?.name || unmetStat[0]}.`;
+    }
     const replacedIds = section.mode === "single"
         ? new Set(section.items.map(choice => choice.id))
         : new Set();
@@ -124,6 +141,9 @@ function sectionVisible(section) {
     return sectionAvailable(section) || section.id === "patron-loan" || section.id === "patron-missions";
 }
 function clearUnavailableSelections() {
+    selected.forEach(id => {
+        if (!findChoice(id)) selected.delete(id);
+    });
     data.sections.forEach(section => section.items.forEach(item => {
         if (selected.has(item.id) && !itemAvailable(section, item)) selected.delete(item.id);
     }));
@@ -181,7 +201,7 @@ function render() {
     $("#selected-count").textContent = selected.size;
     $("#attribute-points").textContent = availableAttributePoints();
     const groups = new Map();
-    data.sections.filter(sectionVisible).forEach(sec => {
+    data.sections.filter(sectionVisible).filter(section => !section.id.startsWith("appearance-")).forEach(sec => {
         const title = sec.title || "";
         const group = title.startsWith("Background:") ? ["background", "Background"]
             : title.startsWith("World:") ? ["world", "World"]
@@ -196,14 +216,30 @@ function render() {
     $("#sections").innerHTML = [...groups.entries()].map(([key, group]) => {
         const sections = group.sections.map(sec => {
             if (sec.id === "patron-choices") return "";
+            if (sec.id === "patron-alignment") {
+                const patronSection = data.sections.find(section => section.id === "patron-choices");
+                const patronItems = patronSection?.items.filter(item =>
+                    itemAvailable(patronSection, item) && (item.name + " " + item.description).toLowerCase().includes(q)
+                ) || [];
+                const alignments = sec.items.filter(item =>
+                    (item.name + " " + item.description).toLowerCase().includes(q)
+                    || (selected.has(item.id) && patronItems.length > 0)
+                );
+                if (!alignments.length && !patronItems.length) return "";
+                const expanded = openSections.has(sec.id) || Boolean(q);
+                const selectedCount = sec.items.filter(item => selected.has(item.id)).length
+                    + (patronSection?.items.filter(item => selected.has(item.id)).length || 0);
+                const alignmentAccordions = alignments.map(item => {
+                    const alignmentKey = `alignment-accordion-${item.alignment}`;
+                    const alignmentExpanded = openSections.has(alignmentKey) || Boolean(q);
+                    const current = selected.has(item.id);
+                    const showPatrons = current && alignmentExpanded && patronSection;
+                    return `<section class="section subsection alignment-option" id="${escapeHTML(alignmentKey)}"><button class="section-toggle subsection-toggle alignment-accordion-toggle" type="button" data-alignment-choice="${escapeHTML(item.id)}" aria-pressed="${current}" aria-expanded="${alignmentExpanded}" aria-controls="content-${escapeHTML(alignmentKey)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(item.name)}</span><span class="section-toggle-meta">${current ? "Selected alignment" : "Choose alignment"}${current && selectedPatron() ? ` · ${escapeHTML(selectedPatron().name)}` : ""}</span></span><span class="section-chevron" aria-hidden="true">${alignmentExpanded ? "−" : "+"}</span></button><div class="section-content alignment-accordion-content" id="content-${escapeHTML(alignmentKey)}" ${alignmentExpanded ? "" : "hidden"}>${showPatrons ? `<p class="desc alignment-perk">${escapeHTML(item.description || "")}</p><div class="patron-choice-list"><h3>Choose a ${escapeHTML(item.name)} patron</h3><p class="desc">${escapeHTML(patronSection.description || "")}</p><div class="grid">${patronItems.map(patron => renderCard(patronSection, patron)).join("")}</div></div>` : ""}</div></section>`;
+                }).join("");
+                return `<section class="section subsection" id="${escapeHTML(sec.id)}"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(sec.title.replace(/^Patron:\\s*/, ""))}</span><span class="section-toggle-meta">Choose one${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}><p class="desc">${escapeHTML(sec.description || "")}</p>${alignmentAccordions}</div></section>`;
+            }
             const items = sec.items.filter(i => itemAvailable(sec, i) && (i.name + " " + i.description).toLowerCase().includes(q));
-            const patronSection = sec.id === "patron-alignment"
-                ? data.sections.find(section => section.id === "patron-choices")
-                : null;
-            const patronItems = patronSection?.items.filter(item =>
-                itemAvailable(patronSection, item) && (item.name + " " + item.description).toLowerCase().includes(q)
-            ) || [];
-            if (!items.length && !patronItems.length && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
+            if (!items.length && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
             const standalone = group.sections.length === 1 && key !== "patron";
             const expanded = (standalone ? openGroups.has(key) : openSections.has(sec.id)) || Boolean(q);
             const selectedCount = sec.items.filter(item => itemAvailable(sec, item) && selected.has(item.id)).length;
@@ -211,9 +247,6 @@ function render() {
             const toggleData = standalone ? `data-group="${escapeHTML(key)}"` : "";
             const title = standalone ? group.title : sec.title.replace(/^Patron:\s*/, "");
             const randomizer = standalone && key === "background" ? '<button type="button" class="background-randomize" data-randomize-background>Randomize background</button>' : "";
-            const patronChoices = patronSection && selectedAlignment()
-                ? `<div class="patron-choice-list"><h3>Choose a ${escapeHTML(selectedAlignment().name)} patron</h3><p class="desc">${escapeHTML(patronSection.description || "")}</p><div class="grid">${patronItems.map(item => renderCard(patronSection, item)).join("")}</div></div>`
-                : patronSection ? '<p class="desc">Choose Good, Neutral, or Bad / Evil to see its patrons and perk.</p>' : "";
             const unavailableMessage = sec.id === "patron-loan" && !selectedPatron()
                 ? "Choose an alignment and patron first to access a loan."
                 : sec.id === "patron-missions" && selectedAlignment()?.alignment !== "neutral"
@@ -221,7 +254,7 @@ function render() {
                     : "";
             return `<section class="section ${standalone ? "" : "subsection"}" id="${escapeHTML(sec.id)}"><button class="section-toggle ${toggleClass}" type="button" ${toggleData} aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(title)}</span><span class="section-toggle-meta">${sec.mode === "single" ? "Choose one" : "Choose any"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}>${randomizer}<p class="desc">${escapeHTML(sec.description || "")}</p>${unavailableMessage ? `<p class="desc">${escapeHTML(unavailableMessage)}</p>` : `<div class="grid">${items.map(item => {
             return renderCard(sec, item);
-        }).join("")}</div>`}${patronChoices}</div></section>`;
+        }).join("")}</div>`}</div></section>`;
         }).filter(Boolean);
         if (!sections.length) return "";
         if (group.sections.length === 1 && key !== "patron") return sections.join("");
@@ -244,6 +277,7 @@ function toggle(id) {
     let sec = data.sections.find(s => s.items.some(i => i.id === id)); if (!sec) return;
     let item = sec.items.find(i => i.id === id);
     if (!itemAvailable(sec, item)) return;
+    if (sec.id === "patron-alignment" && selected.has(id)) return;
     if (selected.has(id)) {
         selected.delete(id);
         clearUnavailableSelections();
@@ -275,8 +309,61 @@ function renderStats() {
         const limitLabel = a.id === "constitution" ? "sets effective cap" : `max ${formatStat(limit)} allocated`;
         return `<article class="stat-box"><div class="stat-box-heading"><h3>${escapeHTML(a.name)}</h3><span class="stat-value">${formatStat(finalValue)}<span class="stat-limit">${value} allocated · ×${formatStat(multiplier)}</span></span></div><p>${escapeHTML(a.description)}</p><div class="stat-allocation-control"><label class="stat-number-control">Allocated points<input type="number" class="stat-allocation-input" data-stat="${escapeHTML(a.id)}" value="${value}" min="0" max="${formatStat(maxValue)}" step="1" inputmode="numeric" aria-label="${escapeHTML(a.name)} allocated points"></label><span class="stat-limit">${escapeHTML(limitLabel)}</span></div></article>`;
     }).join("");
+    const appearanceSections = data.sections.filter(section => section.id.startsWith("appearance-"));
+    const query = ($("#search")?.value || "").toLowerCase();
+    const accordionGroups = [
+        { id: "face", title: "Face", sections: ["appearance-face"], randomizer: "face" },
+        { id: "body-type", title: "Body Type", sections: ["appearance-body-type"], randomizer: "body-type" },
+        { id: "height", title: "Height", sections: ["appearance-height"], randomizer: "height" },
+        { id: "hair", title: "Hair", sections: ["appearance-hair-color", "appearance-hair-type"], randomizer: "hair" },
+        { id: "eyes", title: "Eyes", sections: ["appearance-eye-color", "appearance-eye-shape"], randomizer: "eyes" },
+        { id: "teeth", title: "Teeth", sections: ["appearance-teeth"], randomizer: "teeth" }
+    ];
+    const ethnicitySection = appearanceSections.find(section => section.id === "appearance-ethnicity");
+    const accordionMarkup = accordionGroups.map(group => {
+        const sections = group.sections.map(id => appearanceSections.find(section => section.id === id)).filter(Boolean);
+        const choices = sections.map(section => {
+            const items = section.items.filter(item => (item.name + " " + item.description).toLowerCase().includes(query));
+            if (!items.length && query) return "";
+            const title = sections.length > 1 ? `<h3 class="appearance-subtitle">${escapeHTML(section.title.replace(/^Appearance:\s*/, ""))}</h3>` : "";
+            return `${title}<p class="desc">${escapeHTML(section.description || "")}</p><div class="grid">${items.map(item => renderCard(section, item)).join("")}</div>`;
+        }).join("");
+        if (!choices && query) return "";
+        const open = openSections.has(`appearance-${group.id}`) || Boolean(query);
+        const selectedCount = sections.reduce((count, section) =>
+            count + section.items.filter(item => selected.has(item.id)).length, 0
+        );
+        return `<section class="section subsection appearance-accordion" id="appearance-${group.id}"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${open}" aria-controls="content-appearance-${group.id}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(group.title)}</span><span class="section-toggle-meta">${sections.length === 1 ? sections[0].mode === "single" ? "Choose one" : "Choose any" : "Choose features"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${open ? "−" : "+"}</span></button><div class="section-content appearance-accordion-content" id="content-appearance-${group.id}" ${open ? "" : "hidden"}><button type="button" class="appearance-randomize" data-randomize-appearance="${group.randomizer}">Randomize ${escapeHTML(group.title.toLowerCase())}</button>${choices}</div></section>`;
+    }).join("");
+    const appearanceOpen = openSections.has("appearance-maxing") || Boolean(query);
+    $("#appearance-builder").innerHTML = appearanceSections.length
+        ? `<section class="section appearance-maxing" id="appearance-maxing"><button class="section-toggle subsection-toggle appearance-maxing-toggle" type="button" aria-expanded="${appearanceOpen}" aria-controls="content-appearance-maxing"><span class="section-toggle-main"><span class="section-toggle-title" id="appearance-title">Appearance Maxing</span></span><span class="section-chevron" aria-hidden="true">${appearanceOpen ? "−" : "+"}</span></button><div class="section-content appearance-maxing-content" id="content-appearance-maxing" ${appearanceOpen ? "" : "hidden"}><p class="desc">Choose your appearance. Options marked with a requirement unlock when your allocated stats meet it.</p><button type="button" class="appearance-randomize randomize-body" data-randomize-appearance="body">Randomize Body</button><div class="appearance-ethnicity"><label for="appearance-ethnicity-input">Ethnicity</label><p class="desc">${escapeHTML(ethnicitySection?.description || "Describe your heritage, ancestry, and complexion.")}</p><textarea id="appearance-ethnicity-input" rows="3" placeholder="Describe any real-world, mixed, or fictional ethnicity...">${escapeHTML(appearanceEthnicity)}</textarea></div>${accordionMarkup}</div></section>`
+        : "";
 }
-function exportJSON() { let blob = new Blob([JSON.stringify({ data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold }, null, 2)], { type: "application/json" }); download(blob, "karma-build.json") }
+function randomizeAppearance(group) {
+    const sectionIds = {
+        body: /^appearance-(face|body-type|height|hair-|eye-|teeth)/,
+        face: /^appearance-face$/,
+        "body-type": /^appearance-body-type$/,
+        height: /^appearance-height$/,
+        hair: /^appearance-hair-(color|type)$/,
+        eyes: /^appearance-eye-(color|shape)$/,
+        teeth: /^appearance-teeth$/
+    }[group];
+    if (!sectionIds) return;
+    const sections = data.sections.filter(section => sectionIds.test(section.id));
+    sections.forEach(section => section.items.forEach(item => selected.delete(item.id)));
+    sections.forEach(section => {
+        const available = section.items.filter(item =>
+            itemAvailable(section, item) && !choiceDisabledReason(section, item)
+        );
+        if (available.length) selected.add(available[Math.floor(Math.random() * available.length)].id);
+    });
+    clearUnavailableSelections();
+    save();
+    render();
+}
+function exportJSON() { let blob = new Blob([JSON.stringify({ data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold, appearanceEthnicity }, null, 2)], { type: "application/json" }); download(blob, "karma-build.json") }
 function download(blob, name) { let a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href) }
 function selectedChoices() {
     return data.sections.flatMap(section => section.items
@@ -285,11 +372,28 @@ function selectedChoices() {
 }
 function renderSummary() {
     const choices = selectedChoices();
-    $("#summary-content").innerHTML = choices.length
-        ? `<ul class="summary-choice-list">${choices.map(({ section, item }) => `<li><details><summary>${escapeHTML(section.title)} — ${escapeHTML(item.name)} <span class="muted">(${costLabel(effectiveCost(section, item))})</span></summary><p>${escapeHTML(item.description || "No description provided.")}</p></details></li>`).join("")}</ul>`
+    const showDescriptions = $("#show-summary-descriptions").checked;
+    const grouped = new Map();
+    choices.forEach(({ section, item }) => {
+        const title = section.id.startsWith("appearance-") ? "Appearance Maxing" : section.title;
+        if (!grouped.has(title)) grouped.set(title, []);
+        grouped.get(title).push({ section, item });
+    });
+    if (appearanceEthnicity.trim()) {
+        if (!grouped.has("Appearance Maxing")) grouped.set("Appearance Maxing", []);
+        grouped.get("Appearance Maxing").push({ ethnicity: appearanceEthnicity.trim() });
+    }
+    $("#summary-content").innerHTML = grouped.size
+        ? `<div class="summary-sections">${[...grouped].map(([title, entries]) => `<section class="summary-section"><h3>${escapeHTML(title)}</h3><ul>${entries.map(entry => {
+            if (entry.ethnicity) return `<li><strong>Ethnicity:</strong> ${escapeHTML(entry.ethnicity)}</li>`;
+            const { section, item } = entry;
+            return `<li><strong>${escapeHTML(item.name)}</strong> <span class="muted">(${costLabel(effectiveCost(section, item))})</span>${showDescriptions ? `<p>${escapeHTML(item.description || "No description provided.")}</p>` : ""}</li>`;
+        }).join("")}</ul></section>`).join("")}</div>`
         : "<p>No choices selected yet.</p>";
     const separator = $("#separate-choice-rows").checked ? "\n" : ", ";
-    $("#choice-titles").value = choices.map(({ item }) => item.name).join(separator);
+    const titles = choices.map(({ item }) => item.name);
+    if (appearanceEthnicity.trim()) titles.unshift(`Ethnicity: ${appearanceEthnicity.trim()}`);
+    $("#choice-titles").value = titles.join(separator);
     $("#choice-ids").value = choices.map(({ item }) => item.id).join(separator);
 }
 function openSummary() {
@@ -341,9 +445,36 @@ function importChoiceIds() {
     renderSummary();
     $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} imported.`;
 }
-function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = addDefaultModifiers(migratePatronSections(obj.data)); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0 } else { data = addDefaultModifiers(migratePatronSections(obj)); selected.clear() } clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
+function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = addDefaultModifiers(migratePatronSections(obj.data)); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = addDefaultModifiers(migratePatronSections(obj)); selected.clear(); appearanceEthnicity = "" } clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
 document.addEventListener("click", e => {
     const card = e.target.closest(".card[data-id]"); if (card) toggle(card.dataset.id);
+    const alignmentChoice = e.target.closest("[data-alignment-choice]");
+    if (alignmentChoice) {
+        const id = alignmentChoice.dataset.alignmentChoice;
+        const section = data.sections.find(item => item.id === "patron-alignment");
+        const alreadySelected = selected.has(id);
+        const accordionId = alignmentChoice.closest(".alignment-option").id;
+        if (alreadySelected) {
+            if (openSections.has(accordionId)) openSections.delete(accordionId);
+            else openSections.add(accordionId);
+        } else {
+            section.items.forEach(item => {
+                selected.delete(item.id);
+                if (item.id !== id) openSections.delete(`alignment-accordion-${item.alignment}`);
+            });
+            selected.add(id);
+            openSections.add(accordionId);
+            clearUnavailableSelections();
+            save();
+        }
+        render();
+        return;
+    }
+    const appearanceRandomizer = e.target.closest("[data-randomize-appearance]");
+    if (appearanceRandomizer) {
+        randomizeAppearance(appearanceRandomizer.dataset.randomizeAppearance);
+        return;
+    }
     if (e.target.closest("[data-randomize-background]")) {
         data.sections.filter(section => section.title.startsWith("Background:")).forEach(section => {
             section.items.forEach(item => selected.delete(item.id));
@@ -386,7 +517,7 @@ document.addEventListener("click", e => {
         render();
     }
     if (e.target.closest("#stats-toggle")) { statsOpen = !statsOpen; render() }
-    if (e.target.closest("#reset")) { if (confirm("Reset selections, stat allocations, and bought or sold attribute points? Spent karma will not be refunded.")) { selected.clear(); stats = {}; attributePointsBought = 0; attributePointsSold = 0; save(); render() } }
+    if (e.target.closest("#reset")) { if (confirm("Reset selections, stat allocations, appearance notes, and bought or sold attribute points? Spent karma will not be refunded.")) { selected.clear(); stats = {}; appearanceEthnicity = ""; attributePointsBought = 0; attributePointsSold = 0; save(); render() } }
     if (e.target.closest("#summary")) openSummary();
     if (e.target.closest("#close-summary")) $("#summary-modal").classList.remove("open");
     if (e.target.id === "summary-modal") e.target.classList.remove("open");
@@ -429,13 +560,23 @@ document.addEventListener("change", e => {
             return;
         }
         stats[id] = nextValue;
+        clearUnavailableSelections();
         save();
         render();
     }
 });
 document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.matches(".card[data-id]")) { e.preventDefault(); toggle(e.target.dataset.id) } });
-document.addEventListener("input", e => { if (e.target.id === "search") render() });
-document.addEventListener("change", e => { if (e.target.id === "separate-choice-rows") renderSummary() });
+document.addEventListener("input", e => {
+    if (e.target.id === "search") render();
+    if (e.target.id === "appearance-ethnicity-input") {
+        appearanceEthnicity = e.target.value;
+        save();
+        if ($("#summary-modal").classList.contains("open")) renderSummary();
+    }
+});
+document.addEventListener("change", e => {
+    if (e.target.id === "separate-choice-rows" || e.target.id === "show-summary-descriptions") renderSummary();
+});
 $("#import").addEventListener("change", e => { if (e.target.files[0]) importFile(e.target.files[0]); e.target.value = "" });
-$("#save-build").addEventListener("click", () => { save(); let build = { data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold }; download(new Blob([JSON.stringify(build, null, 2)], { type: "application/json" }), "karma-build.json"); });
+$("#save-build").addEventListener("click", () => { save(); let build = { data, selected: [...selected], points, stats, attributePointsBought, attributePointsSold, appearanceEthnicity }; download(new Blob([JSON.stringify(build, null, 2)], { type: "application/json" }), "karma-build.json"); });
 render();

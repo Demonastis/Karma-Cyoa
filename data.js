@@ -1318,6 +1318,150 @@ window.KARMA_DATA = {
           "description": "You experience a persistent feeling of sadness."
         }
       ]
+    },
+    {
+      "id": "appearance-ethnicity",
+      "title": "Appearance: Ethnicity",
+      "description": "Describe your ethnicity, ancestry, and any real-world or fictional details you want.",
+      "mode": "single",
+      "items": []
+    },
+    {
+      "id": "appearance-face",
+      "title": "Appearance: Face",
+      "description": "Your facial appearance. Higher tiers require the listed allocated Constitution.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-face-mother", "name": "A Face Only a Mother Could Love", "cost": -5, "description": "An unusually unattractive face; gain 5 points." },
+        { "id": "appearance-face-plain", "name": "Plain", "cost": 0, "description": "An unremarkable, ordinary appearance." },
+        { "id": "appearance-face-pleasant", "name": "Pleasant", "cost": 0, "requiresStats": { "constitution": 6 }, "description": "A pleasant, appealing face. Requires 6 or more allocated Constitution." },
+        { "id": "appearance-face-striking", "name": "Striking", "cost": 0, "requiresStats": { "constitution": 8 }, "description": "Distinctive features that draw attention. Requires 8 or more allocated Constitution." },
+        { "id": "appearance-face-stunning", "name": "Stunning", "cost": 0, "requiresStats": { "constitution": 10 }, "description": "Exceptionally beautiful or handsome features. Requires 10 or more allocated Constitution." },
+        { "id": "appearance-face-godly", "name": "Godly", "cost": 0, "requiresStats": { "constitution": 11 }, "description": "An almost impossibly beautiful or handsome face. Requires 11 or more allocated Constitution." }
+      ]
+    },
+    {
+      "id": "appearance-body-type",
+      "title": "Appearance: Body Type",
+      "description": "Your natural build. Athletic and muscular options require the listed allocated Strength.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-body-big-boned", "name": "Big-Boned", "cost": -10, "description": "A larger frame and hitbox that uses more energy; gain 10 points." },
+        { "id": "appearance-body-chubby", "name": "Chubby", "cost": -5, "description": "A softer build that uses more energy; gain 5 points." },
+        { "id": "appearance-body-thin", "name": "Thin", "cost": -5, "description": "A lean build that loses more fat than it should; gain 5 points." },
+        { "id": "appearance-body-average", "name": "Average", "cost": 0, "description": "An ordinary build with no notable extremes." },
+        { "id": "appearance-body-toned", "name": "Toned", "cost": 0, "requiresStats": { "strength": 6 }, "description": "A visibly fit, defined build. Requires 6 or more allocated Strength." },
+        { "id": "appearance-body-athletic", "name": "Athletic", "cost": 0, "requiresStats": { "strength": 8 }, "description": "A strong, athletic physique. Requires 8 or more allocated Strength." },
+        { "id": "appearance-body-muscular", "name": "Muscular", "cost": 0, "requiresStats": { "strength": 10 }, "description": "A heavily developed muscular build. Requires 10 or more allocated Strength." },
+        { "id": "appearance-body-adonis", "name": "Adonis", "cost": 0, "requiresStats": { "strength": 11 }, "description": "An exceptionally sculpted physique. Requires 11 or more allocated Strength." }
+      ]
+    },
+    {
+      "id": "appearance-height",
+      "title": "Appearance: Height",
+      "description": "Choose your stature, or randomize it.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-height-diminutive", "name": "Diminutive", "cost": 0, "description": "Noticeably tiny stature, well under five feet tall with compact proportions." },
+        { "id": "appearance-height-short", "name": "Short", "cost": 0, "description": "Below average height, roughly between 5'0\" and 5'4\"." },
+        { "id": "appearance-height-average", "name": "Average", "cost": 0, "description": "Standard, middle-of-the-road height, roughly between 5'5\" and 5'10\"." },
+        { "id": "appearance-height-tall", "name": "Tall", "cost": 0, "description": "Above average stature with longer limbs, roughly between 5'11\" and 6'3\"." },
+        { "id": "appearance-height-towering", "name": "Towering", "cost": 0, "description": "Imposing, head-and-shoulders taller than most people, around 6'4\" to 6'10\"." },
+        { "id": "appearance-height-gigantic", "name": "Gigantic", "cost": 0, "description": "Massive, near-superhuman height exceeding seven feet tall." }
+      ]
+    },
+    {
+      "id": "appearance-hair-color",
+      "title": "Appearance: Hair Color",
+      "description": "Choose your hair color.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-hair-jet-black", "name": "Jet Black", "cost": 0, "description": "Deep, pure black that absorbs light with a subtle dark sheen." },
+        { "id": "appearance-hair-dark-brown", "name": "Dark Brown", "cost": 0, "description": "Rich, earthy espresso or chocolate tones." },
+        { "id": "appearance-hair-light-brown", "name": "Light Brown", "cost": 0, "description": "Warm chestnut, hazel, or soft caramel shades." },
+        { "id": "appearance-hair-dirty-blonde", "name": "Dirty Blonde", "cost": 0, "description": "Muted, sandy mix of light brown and dull gold." },
+        { "id": "appearance-hair-golden-blonde", "name": "Golden Blonde", "cost": 0, "description": "Bright, warm yellow-gold strands that catch the sunlight." },
+        { "id": "appearance-hair-platinum-blonde", "name": "Platinum Blonde", "cost": 0, "description": "Pale, icy near-white blonde with a cool silver tint." },
+        { "id": "appearance-hair-auburn", "name": "Auburn", "cost": 0, "description": "Deep reddish-brown with warm copper undertones." },
+        { "id": "appearance-hair-ginger", "name": "Ginger", "cost": 0, "description": "Vibrant, fiery orange-red tones." },
+        { "id": "appearance-hair-silver", "name": "Silver", "cost": 0, "description": "Sleek, metallic gray-white with a cool sheen." },
+        { "id": "appearance-hair-snow-white", "name": "Snow White", "cost": 0, "description": "Pure, stark white completely devoid of pigment." },
+        { "id": "appearance-hair-pastel", "name": "Pastel", "cost": 0, "description": "Soft, muted shades like baby pink, lavender, or mint." },
+        { "id": "appearance-hair-neon", "name": "Neon", "cost": 0, "description": "Bright, hyper-saturated colors like electric blue, crimson, or lime." },
+        { "id": "appearance-hair-ombre", "name": "Ombre", "cost": 0, "description": "Gradually fades from a darker shade at the roots to a lighter or contrasting color at the tips." },
+        { "id": "appearance-hair-streaked", "name": "Streaked", "cost": 0, "description": "Base hair color accented with bold, contrasting highlights or strands." }
+      ]
+    },
+    {
+      "id": "appearance-hair-type",
+      "title": "Appearance: Hair Type",
+      "description": "Choose your hairstyle or hair texture.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-hair-type-bald", "name": "Bald", "cost": 0, "description": "Completely smooth and hairless scalp." },
+        { "id": "appearance-hair-type-buzzed", "name": "Buzzed", "cost": 0, "description": "Very closely cropped, uniform stubble covering the head." },
+        { "id": "appearance-hair-type-short", "name": "Short", "cost": 0, "description": "Trimmed neat and close, stopping above the ears and collar." },
+        { "id": "appearance-hair-type-styled", "name": "Styled", "cost": 0, "description": "Carefully shaped, parted, or sculpted into a deliberate cut." },
+        { "id": "appearance-hair-type-long", "name": "Long", "cost": 0, "description": "Flowing strands that reach down past the shoulders or back." },
+        { "id": "appearance-hair-type-spiky", "name": "Spiky", "cost": 0, "description": "Sharp, pointed tufts standing upright or outward in jagged angles." },
+        { "id": "appearance-hair-type-curly", "name": "Curly", "cost": 0, "description": "Dense, springy ringlets and tight spirals with plenty of volume." },
+        { "id": "appearance-hair-type-wavy", "name": "Wavy", "cost": 0, "description": "Soft, loose S-shaped bends that fall naturally around the face." },
+        { "id": "appearance-hair-type-braided", "name": "Braided", "cost": 0, "description": "Woven neatly into tight plaits, cornrows, or intricate locks." },
+        { "id": "appearance-hair-type-messy", "name": "Messy", "cost": 0, "description": "Tousled, uneven strands falling in loose, untamed layers." }
+      ]
+    },
+    {
+      "id": "appearance-eye-color",
+      "title": "Appearance: Eye Color",
+      "description": "Choose your eye color.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-eyes-obsidian", "name": "Obsidian", "cost": 0, "description": "Deep, near-black irises where the pupil barely stands out." },
+        { "id": "appearance-eyes-dark-brown", "name": "Dark Brown", "cost": 0, "description": "Rich, warm chocolate or coffee tones." },
+        { "id": "appearance-eyes-amber", "name": "Amber", "cost": 0, "description": "Glowing, golden-brown or copper irises with warm depth." },
+        { "id": "appearance-eyes-hazel", "name": "Hazel", "cost": 0, "description": "Blended mix of green, gold, and light brown flecks." },
+        { "id": "appearance-eyes-emerald", "name": "Emerald", "cost": 0, "description": "Vivid, jewel-toned green irises." },
+        { "id": "appearance-eyes-ice-blue", "name": "Ice Blue", "cost": 0, "description": "Pale, crystalline blue with a cool, translucent look." },
+        { "id": "appearance-eyes-sapphire", "name": "Sapphire", "cost": 0, "description": "Deep, saturated ocean blue." },
+        { "id": "appearance-eyes-slate-gray", "name": "Slate Gray", "cost": 0, "description": "Cool, smoky silver-gray irises." },
+        { "id": "appearance-eyes-violet", "name": "Violet", "cost": 0, "description": "Rare, soft purple or lavender-tinted irises." },
+        { "id": "appearance-eyes-crimson", "name": "Crimson", "cost": 0, "description": "Striking, vivid red irises." },
+        { "id": "appearance-eyes-heterochromia", "name": "Heterochromia", "cost": 0, "description": "Two distinctly different colored irises, or a ring of contrasting color around the pupil." },
+        { "id": "appearance-eyes-rainbow", "name": "Rainbow", "cost": 0, "description": "Eyes that sparkle in different shades of color; they are sure to attract attention." }
+      ]
+    },
+    {
+      "id": "appearance-eye-shape",
+      "title": "Appearance: Eye Shape",
+      "description": "Choose your eye shape.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-eye-shape-almond", "name": "Almond", "cost": 0, "description": "Balanced, oval shape that tapers neatly at both corners." },
+        { "id": "appearance-eye-shape-round", "name": "Round", "cost": 0, "description": "Large, open, and circular with visible white above or below the iris." },
+        { "id": "appearance-eye-shape-hooded", "name": "Hooded", "cost": 0, "description": "Heavy upper brow bone that partially folds over the eyelid crease." },
+        { "id": "appearance-eye-shape-monolid", "name": "Monolid", "cost": 0, "description": "Smooth upper lid surface without a defined crease." },
+        { "id": "appearance-eye-shape-upturned", "name": "Upturned", "cost": 0, "description": "Outer corners lift slightly upward, creating a subtle cat-eye tilt." },
+        { "id": "appearance-eye-shape-downturned", "name": "Downturned", "cost": 0, "description": "Outer corners angle gently downward for a softer, sloped line." },
+        { "id": "appearance-eye-shape-deep-set", "name": "Deep-Set", "cost": 0, "description": "Positioned further back under a prominent brow ridge." },
+        { "id": "appearance-eye-shape-narrow", "name": "Narrow", "cost": 0, "description": "Sleek, sharp, and horizontally elongated with a focused look." }
+      ]
+    },
+    {
+      "id": "appearance-teeth",
+      "title": "Appearance: Teeth",
+      "description": "Choose your teeth.",
+      "mode": "single",
+      "items": [
+        { "id": "appearance-teeth-straight", "name": "Straight", "cost": 0, "description": "Evenly aligned, smooth, and uniform rows of flat-edged teeth." },
+        { "id": "appearance-teeth-slightly-crooked", "name": "Slightly Crooked", "cost": 0, "description": "Natural, minor overlaps or subtle tilts that break up uniform symmetry." },
+        { "id": "appearance-teeth-gapped", "name": "Gapped", "cost": 0, "description": "Distinct, small spaces between the front or side teeth." },
+        { "id": "appearance-teeth-buck", "name": "Buck", "cost": 0, "description": "Prominent, slightly oversized upper front teeth that rest noticeably forward." },
+        { "id": "appearance-teeth-snaggletooth", "name": "Snaggletooth", "cost": 0, "description": "A single crooked or overlapping canine that juts out slightly when smiling." },
+        { "id": "appearance-teeth-single-fang", "name": "Single Fang", "cost": 0, "description": "One subtly pointed canine tooth that peeks out even when the mouth is closed." },
+        { "id": "appearance-teeth-vampire", "name": "Vampire", "cost": 0, "description": "Two sleek, elongated, and razor-pointed upper canines among otherwise normal teeth." },
+        { "id": "appearance-teeth-sharp", "name": "Sharp", "cost": 0, "description": "Every tooth tapers to a fine, jagged, triangular point like a shark or predator." },
+        { "id": "appearance-teeth-tusks", "name": "Tusks", "cost": 0, "description": "Thick, curved lower canines that jut upward past the bottom lip." }
+      ]
     }
   ],
   "stats": {

@@ -56,7 +56,18 @@
             localStorage.setItem("karma-data", JSON.stringify(content));
             return content;
         }
-        let data = (() => { try { const saved = localStorage.getItem("karma-data"); return saved ? migratePatronSections(JSON.parse(saved)) : clone(DEFAULT) } catch { return clone(DEFAULT) } })();
+        function addDefaultAppearanceSections(content) {
+            const existing = new Set(content.sections.map(section => section.id));
+            DEFAULT.sections.filter(section => section.id.startsWith("appearance-") && !existing.has(section.id))
+                .forEach(section => content.sections.push(clone(section)));
+            const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
+            if (ethnicity) {
+                ethnicity.items = [];
+                ethnicity.description = DEFAULT.sections.find(section => section.id === "appearance-ethnicity").description;
+            }
+            return content;
+        }
+        let data = (() => { try { const saved = localStorage.getItem("karma-data"); return saved ? addDefaultAppearanceSections(migratePatronSections(JSON.parse(saved))) : clone(DEFAULT) } catch { return clone(DEFAULT) } })();
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         function save() { localStorage.setItem("karma-data", JSON.stringify(data)); }
         const ids = value => Array.isArray(value) ? value.join(", ") : String(value || "");
