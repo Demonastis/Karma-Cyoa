@@ -59,6 +59,7 @@
                     </div>
                 </div>
                 <div class="stat-grid" id="stat-grid"></div>
+                <section class="appearance-builder" id="appearance-builder" aria-labelledby="appearance-title"></section>
             </div>
         </section>
 
@@ -92,7 +93,21 @@
     <div class="modal" id="summary-modal">
         <div class="modal-card">
             <h2>Your next life</h2>
+            <label class="summary-option"><input id="show-summary-descriptions" type="checkbox"> Show choice descriptions</label>
             <div id="summary-content"></div>
+            <section class="summary-build-form">
+                <h3>Build Form</h3>
+                <label class="summary-option"><input id="separate-choice-rows" type="checkbox"> Separate choice titles by row</label>
+                <div class="summary-output-grid">
+                    <label>Current activated choice titles<textarea id="choice-titles" readonly rows="5"></textarea><button type="button" data-copy-output="choice-titles">Copy titles</button></label>
+                    <label>Current activated choice IDs<textarea id="choice-ids" readonly rows="5"></textarea><button type="button" data-copy-output="choice-ids">Copy IDs</button></label>
+                </div>
+                <label>Import activated choices with a list of IDs<textarea id="choice-import" rows="4" placeholder="Paste choice IDs separated by commas, spaces, or new lines. Leave empty to clear selections."></textarea></label>
+                <div class="summary-import-actions">
+                    <button type="button" class="primary" id="import-choices">Import choices / clear if empty</button>
+                    <span class="muted small" id="choice-import-status" role="status"></span>
+                </div>
+            </section>
             <div class="form-actions"><button id="close-summary">Close</button></div>
         </div>
     </div>

@@ -25,16 +25,140 @@
         <div class="toolbar"><input id="filter" placeholder="Filter sections and choices…"><button id="reset-content"
                 class="danger">Restore original content</button></div>
         <div id="editor"></div>
+        <datalist id="choice-id-options"></datalist>
     </main>
     <script src="data.js"></script>
     <script>
-        const clone = o => JSON.parse(JSON.stringify(o)), DEFAULT = clone(window.KARMA_DATA); let data = (() => { try { return JSON.parse(localStorage.getItem("karma-data")) || clone(DEFAULT) } catch { return clone(DEFAULT) } })();
+        const clone = o => JSON.parse(JSON.stringify(o)), DEFAULT = clone(window.KARMA_DATA);
+        function migratePatronSections(content) {
+            const oldAlignment = content.sections.find(section => section.id === "patron-alignment");
+            if (oldAlignment?.items.some(item => item.id.startsWith("alignment-"))) return content;
+            const oldPatrons = new Map((oldAlignment?.items || []).map(item => [item.id, item]));
+            const newPatrons = clone(DEFAULT.sections.find(section => section.id === "patron-choices"));
+            newPatrons.items.forEach(item => {
+                const old = oldPatrons.get(item.id);
+                if (old) {
+                    item.cost = old.cost;
+                    item.description = old.description;
+                }
+            });
+            const alignment = clone(DEFAULT.sections.find(section => section.id === "patron-alignment"));
+            const alignmentIndex = content.sections.findIndex(section => section.id === "patron-alignment");
+            if (alignmentIndex < 0) {
+                const pastIndex = content.sections.findIndex(section => section.id === "karma");
+                content.sections.splice(pastIndex < 0 ? 0 : pastIndex, 0, alignment, newPatrons);
+            } else {
+                content.sections.splice(alignmentIndex, 1, alignment, newPatrons);
+            }
+            content.sections = content.sections.filter((section, index) =>
+                section.id !== "patron-choices" || index === content.sections.findIndex(item => item.id === "patron-choices")
+            );
+            localStorage.setItem("karma-data", JSON.stringify(content));
+            return content;
+        }
+        function addDefaultAppearanceSections(content) {
+            const existing = new Set(content.sections.map(section => section.id));
+            DEFAULT.sections.filter(section => section.id.startsWith("appearance-") && !existing.has(section.id))
+                .forEach(section => content.sections.push(clone(section)));
+            const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
+            if (ethnicity) {
+                ethnicity.items = [];
+                ethnicity.description = DEFAULT.sections.find(section => section.id === "appearance-ethnicity").description;
+            }
+            return content;
+        }
+        let data = (() => { try { const saved = localStorage.getItem("karma-data"); return saved ? addDefaultAppearanceSections(migratePatronSections(JSON.parse(saved))) : clone(DEFAULT) } catch { return clone(DEFAULT) } })();
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         function save() { localStorage.setItem("karma-data", JSON.stringify(data)); }
-        function render() { let q = document.querySelector("#filter").value.toLowerCase(); document.querySelector("#editor").innerHTML = data.sections.map((s, si) => { let items = s.items.map((it, ii) => ({ ...it, _ii: ii })).filter(i => (i.name + i.description).toLowerCase().includes(q)); if (!items.length && !s.title.toLowerCase().includes(q)) return ""; return `<details open><summary>${esc(s.title)} <span class="muted small">(${s.items.length} choices)</span></summary><div class="panel"><label>Section title<input data-section="${si}" data-field="title" value="${esc(s.title)}"></label><label>Section description<textarea data-section="${si}" data-field="description">${esc(s.description)}</textarea></label><label>Selection rule<select data-section="${si}" data-field="mode"><option value="multiple" ${s.mode === "multiple" ? "selected" : ""}>Choose any</option><option value="single" ${s.mode === "single" ? "selected" : ""}>Choose one</option></select></label><div class="form-actions"><button data-add="${si}">Add choice</button><button class="danger" data-remove-section="${si}">Delete section</button></div>${items.map(i => `<div class="panel"><div class="form-row"><label>Choice name<input data-item="${si},${i._ii}" data-field="name" value="${esc(i.name)}"></label><label>Cost / reward<input type="number" data-item="${si},${i._ii}" data-field="cost" value="${Number(i.cost) || 0}"></label></div><label>Description<textarea data-item="${si},${i._ii}" data-field="description">${esc(i.description)}</textarea></label><div class="form-actions"><button class="danger" data-remove-item="${si},${i._ii}">Delete choice</button></div></div>`).join("")}</div></details>` }).join("") || '<p class="empty">No matches.</p>' }
-        document.addEventListener("input", e => { if (e.target.dataset.section !== undefined) { let s = data.sections[+e.target.dataset.section]; s[e.target.dataset.field] = e.target.value; save() } else if (e.target.dataset.item) { let [s, i] = e.target.dataset.item.split(",").map(Number); data.sections[s].items[i][e.target.dataset.field] = e.target.dataset.field === "cost" ? Number(e.target.value) : e.target.value; save() } else if (e.target.id === "filter") render() });
+        const ids = value => Array.isArray(value) ? value.join(", ") : String(value || "");
+        function removeChoiceReferences(removedIds) {
+            data.sections.forEach(section => section.items.forEach(item => {
+                ["requires", "incompatibleWith"].forEach(field => {
+                    const remaining = ids(item[field]).split(",").map(id => id.trim()).filter(id => id && !removedIds.has(id));
+                    if (remaining.length) item[field] = remaining;
+                    else delete item[field];
+                });
+            }));
+        }
+        function render() {
+            const q = document.querySelector("#filter").value.toLowerCase();
+            const choices = data.sections.flatMap(section => section.items);
+            document.querySelector("#editor").innerHTML = data.sections.map((section, sectionIndex) => {
+                const items = section.items.map((item, itemIndex) => ({ ...item, _index: itemIndex }))
+                    .filter(item => (item.name + item.description + item.id).toLowerCase().includes(q));
+                if (!items.length && !section.title.toLowerCase().includes(q)) return "";
+                return `<details open><summary>${esc(section.title)} <span class="muted small">(${section.items.length} choices)</span></summary><div class="panel">
+                    <label>Section title<input data-section="${sectionIndex}" data-field="title" value="${esc(section.title)}"></label>
+                    <label>Section description<textarea data-section="${sectionIndex}" data-field="description">${esc(section.description)}</textarea></label>
+                    <label>Selection rule<select data-section="${sectionIndex}" data-field="mode"><option value="multiple" ${section.mode === "multiple" ? "selected" : ""}>Choose any</option><option value="single" ${section.mode === "single" ? "selected" : ""}>Choose one</option></select></label>
+                    <div class="form-actions"><button data-add="${sectionIndex}">Add choice</button><button class="danger" data-remove-section="${sectionIndex}">Delete section</button></div>
+                    ${items.map(item => `<div class="panel">
+                        <div class="muted small">Choice ID: <code>${esc(item.id)}</code></div>
+                        <div class="form-row"><label>Choice name<input data-item="${sectionIndex},${item._index}" data-field="name" value="${esc(item.name)}"></label><label>Cost / reward<input type="number" data-item="${sectionIndex},${item._index}" data-field="cost" value="${Number(item.cost) || 0}"></label></div>
+                        <label>Description<textarea data-item="${sectionIndex},${item._index}" data-field="description">${esc(item.description)}</textarea></label>
+                        <label>Requires choice IDs<input data-item="${sectionIndex},${item._index}" data-rule-field="requires" list="choice-id-options" value="${esc(ids(item.requires))}" placeholder="choice-id, another-choice-id"><span class="muted small">All listed choices must be selected first. Separate IDs with commas.</span></label>
+                        <label>Incompatible choice IDs<input data-item="${sectionIndex},${item._index}" data-rule-field="incompatibleWith" list="choice-id-options" value="${esc(ids(item.incompatibleWith))}" placeholder="choice-id, another-choice-id"><span class="muted small">The listed choices cannot be selected together. This rule works both ways.</span></label>
+                        <div class="form-actions"><button class="danger" data-remove-item="${sectionIndex},${item._index}">Delete choice</button></div>
+                    </div>`).join("")}
+                </div></details>`;
+            }).join("") || '<p class="empty">No matches.</p>';
+            document.querySelector("#choice-id-options").innerHTML = choices.map(item => `<option value="${esc(item.id)}" label="${esc(item.name)}"></option>`).join("");
+        }
+        document.addEventListener("input", e => {
+            if (e.target.dataset.section !== undefined) {
+                const section = data.sections[+e.target.dataset.section];
+                section[e.target.dataset.field] = e.target.value;
+                save();
+            } else if (e.target.dataset.item) {
+                const [sectionIndex, itemIndex] = e.target.dataset.item.split(",").map(Number);
+                const item = data.sections[sectionIndex].items[itemIndex];
+                if (e.target.dataset.ruleField) {
+                    const values = e.target.value.split(",").map(value => value.trim()).filter(Boolean);
+                    if (values.length) item[e.target.dataset.ruleField] = values;
+                    else delete item[e.target.dataset.ruleField];
+                } else {
+                    item[e.target.dataset.field] = e.target.dataset.field === "cost" ? Number(e.target.value) : e.target.value;
+                }
+                save();
+            } else if (e.target.id === "filter") render();
+        });
         document.addEventListener("change", e => { if (e.target.dataset.section !== undefined) { data.sections[+e.target.dataset.section][e.target.dataset.field] = e.target.value; save() } });
-        document.addEventListener("click", e => { let b = e.target.closest("button"); if (!b) return; if (b.dataset.add !== undefined) { let s = data.sections[+b.dataset.add]; s.items.push({ id: "choice-" + Date.now(), name: "New choice", cost: 0, description: "Add a description." }); save(); render() } if (b.dataset.removeItem) { let [s, i] = b.dataset.removeItem.split(",").map(Number); if (confirm("Delete this choice?")) { data.sections[s].items.splice(i, 1); save(); render() } } if (b.dataset.removeSection !== undefined) { if (confirm("Delete this entire section?")) { data.sections.splice(+b.dataset.removeSection, 1); save(); render() } } if (b.id === "new-section") { data.sections.push({ id: "section-" + Date.now(), title: "New Section", description: "Describe this section.", mode: "multiple", items: [] }); save(); render() } if (b.id === "reset-content" && confirm("Restore the original content? Your current edits will be lost.")) { data = clone(DEFAULT); save(); render() } if (b.id === "export") { let a = document.createElement("a"), u = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })); a.href = u; a.download = "karma-content.json"; a.click(); URL.revokeObjectURL(u) } });
+        document.addEventListener("click", e => {
+            const button = e.target.closest("button");
+            if (!button) return;
+            if (button.dataset.add !== undefined) {
+                const section = data.sections[+button.dataset.add];
+                section.items.push({ id: "choice-" + Date.now(), name: "New choice", cost: 0, description: "Add a description." });
+                save(); render();
+            }
+            if (button.dataset.removeItem) {
+                const [sectionIndex, itemIndex] = button.dataset.removeItem.split(",").map(Number);
+                const [removed] = data.sections[sectionIndex].items.splice(itemIndex, 1);
+                if (confirm("Delete this choice?")) {
+                    removeChoiceReferences(new Set([removed.id]));
+                    save(); render();
+                } else {
+                    data.sections[sectionIndex].items.splice(itemIndex, 0, removed);
+                }
+            }
+            if (button.dataset.removeSection !== undefined && confirm("Delete this entire section?")) {
+                const [removed] = data.sections.splice(+button.dataset.removeSection, 1);
+                removeChoiceReferences(new Set(removed.items.map(item => item.id)));
+                save(); render();
+            }
+            if (button.id === "new-section") {
+                data.sections.push({ id: "section-" + Date.now(), title: "New Section", description: "Describe this section.", mode: "multiple", items: [] });
+                save(); render();
+            }
+            if (button.id === "reset-content" && confirm("Restore the original content? Your current edits will be lost.")) {
+                data = clone(DEFAULT); save(); render();
+            }
+            if (button.id === "export") {
+                const anchor = document.createElement("a");
+                const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+                anchor.href = url; anchor.download = "karma-content.json"; anchor.click(); URL.revokeObjectURL(url);
+            }
+        });
         render();
     </script>
 </body>
