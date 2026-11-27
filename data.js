@@ -1932,6 +1932,88 @@ window.KARMA_DATA = {
           "description": "You cannot tell a direct lie. You may omit details or phrase things cleverly, but false statements cause sharp headaches."
         },
         {
+          "id": "cant-hide-a-secret",
+          "name": "Can't Hide a Secret",
+          "cost": -30,
+          "requires": [
+            "honesty-compulsion"
+          ],
+          "description": "You cannot keep a secret. Your face gives away what you are trying to hide."
+        },
+        {
+          "id": "aura-that-attracts-flies",
+          "name": "Aura That Attracts Flies",
+          "cost": -40,
+          "description": "Enemies keep flocking to you even when you are doing nothing. You could be walking down the sidewalk and a goon will still come over to try to take your wallet; they just keep coming."
+        },
+        {
+          "id": "hit-me-aura",
+          "name": "Hit Me Aura",
+          "cost": -20,
+          "description": "Your actions or words attract hate and annoyance, even when you do not mean to provoke anyone."
+        },
+        {
+          "id": "golden-apple-of-my-eye",
+          "name": "Golden Apple of My Eye",
+          "cost": 0,
+          "description": "Someone is infatuated with you. They can become irrationally protective, insisting they know what is best for you."
+        },
+        {
+          "id": "apple-of-discord",
+          "name": "Apple of Discord",
+          "cost": -30,
+          "requires": [
+            "golden-apple-of-my-eye"
+          ],
+          "description": "Multiple people want you for themselves, and they are all too happy to make sure everyone knows it."
+        },
+        {
+          "id": "garbage-truck",
+          "name": "Garbage Truck",
+          "cost": -10,
+          "costWhenSelected": {
+            "choiceId": "golden-apple-of-my-eye",
+            "cost": -30
+          },
+          "description": "You have a distinct smell that drives away people you like; no cologne can cover it. People who cannot smell are immune. If you also have Golden Apple of My Eye, those affected by it can find you by smell, increasing this drawback's reward to 30 points."
+        },
+        {
+          "id": "strange",
+          "name": "Strange",
+          "cost": -10,
+          "description": "People look at you and think you are strange."
+        },
+        {
+          "id": "dangerously-handsome",
+          "name": "Dangerously Handsome",
+          "cost": -10,
+          "description": "You attract the attention of a handsome man, even if you are not handsome yourself. People who hate handsome men still want to see you explode."
+        },
+        {
+          "id": "funny-man",
+          "name": "Funny Man",
+          "cost": -40,
+          "description": "The world conspires to make you the butt of the joke in some way."
+        },
+        {
+          "id": "main-character",
+          "name": "Main Character",
+          "cost": -40,
+          "description": "You are the hero of the play, the main character, and the target. Adventure is more likely to find you."
+        },
+        {
+          "id": "hero-syndrome",
+          "name": "Hero Syndrome",
+          "cost": -30,
+          "description": "You are infected with the urge to save everyone. Just remember: people die when they are killed."
+        },
+        {
+          "id": "number-one",
+          "name": "Number 1",
+          "cost": -40,
+          "description": "You have a rival who grows at the same rate as you. If they surpass you, you lose your power. If they die, another rival will take their place."
+        },
+        {
           "id": "sensory-overload",
           "name": "Sensory Overload",
           "cost": -10,

@@ -202,7 +202,12 @@ function clearUnavailableSelections() {
     }
 }
 function effectiveCost(section, item) {
-    const cost = Number(item.cost) || 0;
+    const conditionalCost = item.costWhenSelected;
+    const cost = Number(
+        conditionalCost && selected.has(conditionalCost.choiceId)
+            ? conditionalCost.cost
+            : item.cost
+    ) || 0;
     const discountedCost = hasLocalPowerDiscount(section, item)
         ? Math.floor(cost * (1 - worldAffinity(item) / 200))
         : cost;
