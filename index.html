@@ -37,31 +37,45 @@
             <a href="guide.html">Read the rules</a>
         </div>
 
-        <div id="sections"></div>
+        <div id="sections-before-genetic"></div>
 
-        <section class="section">
-            <button class="section-toggle" id="stats-toggle" type="button" aria-expanded="false"
-                aria-controls="stats-content">
+        <section class="section group-section" id="genetic-predisposition">
+            <button class="section-toggle group-toggle" id="genetic-predisposition-toggle" type="button"
+                data-group="genetic-predisposition" aria-expanded="false" aria-controls="genetic-predisposition-content">
                 <span class="section-toggle-main">
-                    <span class="section-toggle-title">Allocate Stats</span>
-                    <span class="section-toggle-meta">Customize your attributes</span>
+                    <span class="section-toggle-title">Genetic Predisposition</span>
+                    <span class="section-toggle-meta">Physique, attributes, and appearance</span>
                 </span>
-                <span class="section-chevron" id="stats-chevron" aria-hidden="true">+</span>
+                <span class="section-chevron" id="genetic-predisposition-chevron" aria-hidden="true">+</span>
             </button>
-            <div class="section-content" id="stats-content" hidden>
-                <p class="desc" id="stat-description"></p>
-                <p class="stat-rule" id="stat-rule"></p>
-                <div class="stat-allocation-bar">
-                    <strong id="stat-points-remaining">20 attribute points available</strong>
-                    <div class="stat-allocation-actions">
-                        <button id="buy-stat-point" type="button" class="primary">Buy +1 attribute point · 1 karma</button>
-                        <button id="sell-stat-point" type="button">Sell −1 attribute point · +1 karma</button>
+            <div class="group-content" id="genetic-predisposition-content" hidden>
+                <div id="genetic-physique"></div>
+                <section class="section subsection">
+                    <button class="section-toggle subsection-toggle" id="stats-toggle" type="button" aria-expanded="false"
+                        aria-controls="stats-content">
+                        <span class="section-toggle-main">
+                            <span class="section-toggle-title">Allocate Stats</span>
+                            <span class="section-toggle-meta">Customize your attributes</span>
+                        </span>
+                        <span class="section-chevron" id="stats-chevron" aria-hidden="true">+</span>
+                    </button>
+                    <div class="section-content" id="stats-content" hidden>
+                        <p class="desc" id="stat-description"></p>
+                        <p class="stat-rule" id="stat-rule"></p>
+                        <div class="stat-allocation-bar">
+                            <strong id="stat-points-remaining">20 attribute points available</strong>
+                            <div class="stat-allocation-actions">
+                                <button id="buy-stat-point" type="button" class="primary">Buy +1 attribute point · 1 karma</button>
+                                <button id="sell-stat-point" type="button">Sell −1 attribute point · +1 karma</button>
+                            </div>
+                        </div>
+                        <div class="stat-grid" id="stat-grid"></div>
                     </div>
-                </div>
-                <div class="stat-grid" id="stat-grid"></div>
+                </section>
                 <section class="appearance-builder" id="appearance-builder" aria-labelledby="appearance-title"></section>
             </div>
         </section>
+        <div id="sections-after-genetic"></div>
 
         <div class="site-credit">Local-first CYOA builder · content edits are saved here; use Save build to keep your choices</div>
     </main>

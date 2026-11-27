@@ -38,7 +38,7 @@ window.KARMA_DATA = {
           "alignment": "evil",
           "cost": 0,
           "description": "Evil patrons flip the karma effect of your past: good karma decreases your points, while evil karma increases them. They expect entertainment."
-        },
+        }
       ]
     },
     {
@@ -818,6 +818,13 @@ window.KARMA_DATA = {
           "description": "2× Intelligence and Perception; read people and situations quickly."
         },
         {
+          "id": "broken-limits",
+          "name": "Broken Limits",
+          "cost": 40,
+          "breaksStatLimits": true,
+          "description": "Your body has no limit. Work hard and it'll result into something. This just means you can go beyond your Constitution limit. It doesn't mean you'll progress continually in the same pace."
+        },
+        {
           "id": "apex-predator",
           "name": "Apex Predator",
           "cost": 30,
@@ -1004,49 +1011,121 @@ window.KARMA_DATA = {
           "id": "kinetic-battery",
           "name": "Kinetic Battery",
           "cost": 20,
-          "description": "Absorbs impact force from physical blows and stores it to boost your next strike or sprint."
+          "description": "Absorbs impact force from physical blows and terminal-velocity falls, storing it to boost your next strike or sprint.",
+          "worldAffinities": {
+            "normal": 25,
+            "wuxia": 50,
+            "game": 50,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "cellular-regeneration",
           "name": "Cellular Regeneration",
           "cost": 30,
-          "description": "Rapidly heals cuts, broken bones, and toxins while enough calories are stored."
+          "description": "Rapidly heals cuts, broken bones, and toxins while enough calories are stored.",
+          "worldAffinities": {
+            "normal": 25,
+            "magic": 50,
+            "xianxia": 50,
+            "wuxia": 50,
+            "game": 50,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "combat-flow",
           "name": "Combat Flow",
           "cost": 20,
-          "description": "Heightens reflexes and spatial awareness, helping your body dodge instinctively."
+          "description": "Heightens reflexes and spatial awareness, helping your body dodge instinctively.",
+          "worldAffinities": {
+            "normal": 50,
+            "xianxia": 50,
+            "wuxia": 100,
+            "game": 50,
+            "super": 100
+          }
         },
         {
           "id": "environmental-constitution",
           "name": "Environmental Constitution",
           "cost": 10,
-          "description": "Lets your body withstand extreme heat, freezing cold, low oxygen, and high pressure without discomfort."
+          "description": "Lets your body withstand extreme heat, freezing cold, low oxygen, and high pressure without discomfort.",
+          "worldAffinities": {
+            "normal": 25,
+            "magic": 50,
+            "xianxia": 50,
+            "wuxia": 50,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "density-control",
           "name": "Density Control",
           "cost": 20,
-          "description": "Temporarily increases body weight to anchor you, or reduces it to leap higher and fall safely."
+          "description": "Temporarily increases body weight to anchor you, or reduces it to leap higher and fall safely.",
+          "worldAffinities": {
+            "normal": 25,
+            "xianxia": 50,
+            "super": 100
+          }
         },
         {
           "id": "bio-electricity",
           "name": "Bio-Electricity",
           "cost": 20,
-          "description": "Generates high-voltage charges through physical contact to stun targets or jump-start electronics."
+          "description": "Generates high-voltage charges through physical contact to stun targets or jump-start electronics.",
+          "worldAffinities": {
+            "normal": 25,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "adrenaline-surge",
           "name": "Adrenaline Surge",
           "cost": 15,
-          "description": "Manually controls adrenaline for short bursts beyond normal muscle limits without tearing ligaments."
+          "description": "Manually controls adrenaline for short bursts beyond normal muscle limits without tearing ligaments.",
+          "worldAffinities": {
+            "normal": 100,
+            "wuxia": 100,
+            "game": 50,
+            "super": 100
+          }
         },
         {
           "id": "chameleon-skin",
           "name": "Chameleon Skin",
           "cost": 10,
-          "description": "Changes skin pigmentation and texture to blend into immediate surroundings while standing still."
+          "description": "Changes skin pigmentation and texture to blend into immediate surroundings while standing still.",
+          "worldAffinities": {
+            "normal": 50,
+            "super": 100
+          }
+        },
+        {
+          "id": "vector-touch",
+          "name": "Vector Touch",
+          "cost": 20,
+          "description": "Controls the directional momentum of anything you touch, letting you launch pebbles like bullets or stop speeding vehicles.",
+          "worldAffinities": {
+            "normal": 25,
+            "super": 100
+          }
+        },
+        {
+          "id": "bio-kinetic-adaptation",
+          "name": "Bio-Kinetic Adaptation",
+          "cost": 40,
+          "description": "Rapidly evolves your body mid-combat to counter whatever harms you, growing thick armor, insulating tissue, or gills.",
+          "worldAffinities": {
+            "normal": 25,
+            "xianxia": 50,
+            "super": 100
+          }
         }
       ]
     },
@@ -1060,49 +1139,92 @@ window.KARMA_DATA = {
           "id": "parallel-processing",
           "name": "Parallel Processing",
           "cost": 20,
-          "description": "Splits thought into independent streams for simultaneous analysis, planning, and action."
+          "description": "Splits thought into independent streams for simultaneous analysis, planning, and action.",
+          "worldAffinities": {
+            "normal": 50,
+            "xianxia": 75,
+            "game": 50,
+            "super": 100
+          }
         },
         {
           "id": "mind-palace",
           "name": "Mind Palace",
           "cost": 20,
-          "description": "Photographic memory, instant recall, and the ability to mentally simulate scenarios in slow motion."
+          "description": "Photographic memory, instant recall, and the ability to mentally simulate scenarios in slow motion.",
+          "worldAffinities": {
+            "normal": 50,
+            "xianxia": 75,
+            "super": 100
+          }
         },
         {
           "id": "emotional-dampening",
           "name": "Emotional Dampening",
           "cost": 10,
-          "description": "Maintains calm under extreme pressure and resists panic, fear auras, and mental manipulation."
+          "description": "Maintains calm under extreme pressure and resists panic, fear auras, and mental manipulation.",
+          "worldAffinities": {
+            "normal": 100,
+            "xianxia": 75,
+            "wuxia": 75,
+            "super": 100
+          }
         },
         {
           "id": "lie-detection",
           "name": "Lie Detection",
           "cost": 10,
-          "description": "Reads subtle changes in tone, heartbeat, and micro-expressions to detect deception."
+          "description": "Reads subtle changes in tone, heartbeat, and micro-expressions to detect deception.",
+          "worldAffinities": {
+            "normal": 100,
+            "wuxia": 75,
+            "super": 100
+          }
         },
         {
           "id": "psychometry",
           "name": "Psychometry",
           "cost": 15,
-          "description": "Reads residual emotional impressions and brief surface memories from objects by touch."
+          "description": "Reads residual emotional impressions and brief surface memories from objects by touch.",
+          "worldAffinities": {
+            "magic": 75,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "mental-firewall",
           "name": "Mental Firewall",
           "cost": 15,
-          "description": "Creates a psychic barrier that shocks or damages anyone attempting to read, control, or invade your mind."
+          "description": "Creates a psychic barrier that shocks or damages anyone attempting to read, control, or invade your mind.",
+          "worldAffinities": {
+            "magic": 75,
+            "xianxia": 75,
+            "super": 100
+          }
         },
         {
           "id": "dream-walking",
           "name": "Dream Walking",
           "cost": 20,
-          "description": "Remain lucid while sleeping and enter nearby sleeping targets' dreams to communicate or gather information."
+          "description": "Remain lucid while sleeping and enter nearby sleeping targets' dreams to communicate or gather information.",
+          "worldAffinities": {
+            "magic": 75,
+            "super": 100,
+            "mythos": 50
+          }
         },
         {
           "id": "sensory-tuning",
           "name": "Sensory Tuning",
           "cost": 10,
-          "description": "Precisely controls the five senses: zoom vision, filter background noise, or block pain signals."
+          "description": "Precisely controls the five senses: zoom vision, filter background noise, or block pain signals.",
+          "worldAffinities": {
+            "normal": 100,
+            "xianxia": 75,
+            "wuxia": 75,
+            "super": 100
+          }
         }
       ]
     },
@@ -1116,49 +1238,106 @@ window.KARMA_DATA = {
           "id": "field-medicine",
           "name": "Field Medicine",
           "cost": 20,
-          "description": "Mastery of anatomy, emergency surgery, herbalism, and battlefield trauma care."
+          "description": "Mastery of anatomy, emergency surgery, herbalism, and battlefield trauma care.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "wuxia": 100,
+            "game": 75,
+            "super": 75
+          }
         },
         {
           "id": "tactical-command",
           "name": "Tactical Command",
           "cost": 20,
-          "description": "Deep understanding of military strategy, logistics, terrain advantages, and small-unit tactics."
+          "description": "Deep understanding of military strategy, logistics, terrain advantages, and small-unit tactics.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "wuxia": 100,
+            "super": 75
+          }
         },
         {
           "id": "structural-engineering",
           "name": "Structural Engineering",
           "cost": 20,
-          "description": "Identifies structural weak points in buildings, bridges, and armor, and methods to fortify or demolish them."
+          "description": "Identifies structural weak points in buildings, bridges, and armor, and methods to fortify or demolish them.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "game": 75,
+            "super": 75
+          }
         },
         {
           "id": "polyglot",
-          "name": "Polyglot",
+          "name": "Tongue of the Old Gods",
           "cost": 10,
-          "description": "Instant fluency in reading, writing, and speaking any mundane or ancient language encountered."
+          "description": "Instant fluency in speaking, reading, and understanding every mortal, ancient, beast, spirit, and divine language.",
+          "worldAffinities": {
+            "magic": 100,
+            "mythos": 100
+          }
         },
         {
           "id": "alchemy-chemistry",
           "name": "Alchemy & Chemistry",
           "cost": 20,
-          "description": "Knowledge of chemical reactions, toxicology, metallurgy, and making potions or explosives from raw ingredients."
+          "description": "Knowledge of chemical reactions, toxicology, metallurgy, and making potions or explosives from raw ingredients.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 100,
+            "game": 75,
+            "super": 75
+          }
+        },
+        {
+          "id": "poison-antidote-savant",
+          "name": "Poison & Antidote Savant",
+          "cost": 20,
+          "description": "Immunity to all common worldly venoms and the ability to distill lethal, untraceable toxins from everyday plants and insects.",
+          "worldAffinities": {
+            "magic": 50,
+            "xianxia": 100,
+            "wuxia": 100
+          }
         },
         {
           "id": "survivalism",
           "name": "Survivalism",
           "cost": 15,
-          "description": "Mastery of wilderness navigation, tracking, foraging, shelter building, and identifying edible or poisonous plants."
+          "description": "Mastery of wilderness navigation, tracking, foraging, shelter building, and identifying edible or poisonous plants.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "wuxia": 100
+          }
         },
         {
           "id": "cryptography",
           "name": "Cryptography",
           "cost": 20,
-          "description": "Spots patterns, cracks complex ciphers, bypasses digital security, and understands alien or forgotten writing systems."
+          "description": "Spots patterns, cracks complex ciphers, bypasses digital security, and understands alien or forgotten writing systems.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "game": 75,
+            "super": 75,
+            "mythos": 25
+          }
         },
         {
           "id": "psychology-manipulation",
           "name": "Psychology & Manipulation",
           "cost": 30,
-          "description": "Deep insight into behavior, body language, social engineering, persuasion, and negotiation."
+          "description": "Deep insight into behavior, body language, social engineering, persuasion, and negotiation.",
+          "worldAffinities": {
+            "normal": 100,
+            "magic": 50,
+            "super": 75
+          }
         }
       ]
     },
@@ -1169,115 +1348,581 @@ window.KARMA_DATA = {
       "mode": "multiple",
       "items": [
         {
-          "id": "rune-weaving",
-          "name": "Rune Weaving",
-          "cost": 20,
-          "description": "Carves or draws temporary symbols on objects to grant effects such as sharpness, lightness, or fire resistance."
+          "id": "cantrip-weaver",
+          "name": "Cantrip Weaver",
+          "cost": 10,
+          "description": "Casts basic utility spells (sparks, cleaning, minor illusions, light) instantaneously without a focus, mana cost, or incantations.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 25,
+            "game": 75
+          }
         },
         {
           "id": "mana-sight",
           "name": "Mana Sight",
           "cost": 10,
-          "description": "Sees magical energy, hidden enchantments, curses, and mana flowing through living beings."
+          "description": "Perceives magical energy, hidden enchantments, curses, illusion traps, and the mana reserves of living beings.",
+          "worldAffinities": {
+            "magic": 100,
+            "game": 75
+          }
+        },
+        {
+          "id": "rune-weaving",
+          "name": "Potion & Rune Brewer",
+          "cost": 20,
+          "description": "Intuitive grasp of magical ingredients and runic geometry to brew potent elixirs and carve stable enchantments at half the failure rate.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 25,
+            "game": 75,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "elemental-affinity",
+          "name": "Elemental Affinity",
+          "cost": 20,
+          "description": "Deep bond with one classic element, cutting its spellcasting cost in half and letting you shape it freely without rigid formulas.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 50,
+            "game": 75,
+            "super": 50,
+            "mythos": 75
+          }
         },
         {
           "id": "spatial-pocket",
-          "name": "Spatial Pocket",
+          "name": "Inventory Dimension",
           "cost": 20,
-          "description": "Creates a small personal extradimensional storage space."
-        },
-        {
-          "id": "elemental-transmutation",
-          "name": "Elemental Transmutation",
-          "cost": 20,
-          "description": "Converts raw mana into basic elements such as sparks, water, gusts of wind, or stone."
+          "description": "Accesses a personal, time-locked extradimensional storage space that keeps food hot and potions fresh forever.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 50,
+            "game": 100
+          }
         },
         {
           "id": "shadow-step",
           "name": "Shadow Step",
           "cost": 20,
-          "description": "Merges into a shadow and emerges from another connected or nearby shadow within line of sight."
+          "description": "Merges into a shadow and emerges from another connected or nearby shadow within line of sight.",
+          "worldAffinities": {
+            "magic": 100,
+            "wuxia": 25,
+            "game": 75,
+            "super": 100
+          }
+        },
+        {
+          "id": "short-range-blink",
+          "name": "Short-Range Blink",
+          "cost": 20,
+          "description": "Instantaneously teleports anywhere within your immediate line of sight, carrying yourself and held items through walls.",
+          "worldAffinities": {
+            "magic": 100,
+            "game": 75,
+            "super": 100
+          }
         },
         {
           "id": "soul-bound-weapon",
           "name": "Soul-Bound Weapon",
           "cost": 15,
-          "description": "Binds a mundane weapon to your spirit so it can be summoned and slowly repaired with mana."
-        },
-        {
-          "id": "gravity-nudge",
-          "name": "Gravity Nudge",
-          "cost": 15,
-          "description": "Alters local gravity on small objects or yourself for a few seconds, enabling wall-running or projectile deflection."
+          "description": "Binds a mundane weapon to your spirit so it can be summoned and slowly repaired with mana.",
+          "worldAffinities": {
+            "magic": 100,
+            "wuxia": 25,
+            "game": 75,
+            "mythos": 75
+          }
         },
         {
           "id": "ward-crafting",
           "name": "Ward Crafting",
           "cost": 20,
-          "description": "Sets invisible perimeters that alert you when crossed, block weak spirits, or dampen sound."
+          "description": "Sets invisible perimeters that alert you when crossed, block weak spirits, or dampen sound.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 25,
+            "game": 75,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "twin-spell-casting",
+          "name": "Twin-Spell Casting",
+          "cost": 40,
+          "description": "Splits your mind into two distinct casting threads, allowing you to weave and fire two different spells simultaneously.",
+          "worldAffinities": {
+            "magic": 100,
+            "game": 75
+          }
+        },
+        {
+          "id": "spellbreaker",
+          "name": "Spellbreaker",
+          "cost": 40,
+          "description": "Unravels active spells on contact, slicing through magical barriers, dispelling curses, and disrupting incantations mid-cast.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 25,
+            "game": 75
+          }
+        },
+        {
+          "id": "gravity-well",
+          "name": "Gravity Well",
+          "cost": 40,
+          "description": "Manipulates gravitational pull within a city-block radius to fly, crush targets, or orbit debris as a shield.",
+          "worldAffinities": {
+            "magic": 100,
+            "super": 100
+          }
+        },
+        {
+          "id": "leyline-sovereign",
+          "name": "Leyline Sovereign",
+          "cost": 80,
+          "description": "Taps directly into the planet's raw magical currents, granting functionally limitless mana.",
+          "worldAffinities": {
+            "magic": 100,
+            "game": 25,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "matter-reconstruction",
+          "name": "Matter Reconstruction",
+          "cost": 80,
+          "description": "Disassembles and reassembles the atomic structure of non-living matter at a touch into any shape, element, or machine.",
+          "worldAffinities": {
+            "magic": 100,
+            "game": 25,
+            "super": 100,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "elemental-transmutation",
+          "name": "Elemental Transmutation",
+          "cost": 20,
+          "description": "Converts raw mana into basic elements such as sparks, water, gusts of wind, or stone.",
+          "worldAffinities": {
+            "magic": 100,
+            "xianxia": 50,
+            "super": 50
+          }
+        },
+        {
+          "id": "gravity-nudge",
+          "name": "Gravity Nudge",
+          "cost": 15,
+          "description": "Alters local gravity on small objects or yourself for a few seconds, enabling wall-running or projectile deflection.",
+          "worldAffinities": {
+            "magic": 100,
+            "super": 100
+          }
+        }
+      ]
+    },
+    {
+      "id": "chi-powers",
+      "title": "Powers: Chi & Martial",
+      "description": "Internal energy cultivation, meridian manipulation, and transcendent martial arts.",
+      "mode": "multiple",
+      "items": [
+        {
+          "id": "acupoint-mastery",
+          "name": "Acupoint Mastery",
+          "cost": 10,
+          "description": "Knows every meridian node on the human body to paralyze foes, stop bleeding, or trigger adrenaline bursts with a finger tap.",
+          "worldAffinities": {
+            "normal": 25,
+            "xianxia": 100,
+            "wuxia": 100,
+            "super": 50
+          }
+        },
+        {
+          "id": "feather-step-qinggong",
+          "name": "Feather-Step Qinggong",
+          "cost": 10,
+          "description": "Distributes internal energy into your soles to sprint across water, scale vertical walls, and glide over treetops.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 100
+          }
+        },
+        {
+          "id": "spiritual-sense",
+          "name": "Spiritual Sense",
+          "cost": 10,
+          "description": "Projects consciousness outward in a wide radius to see through walls, track hidden enemies, and inspect items in 360 degrees.",
+          "worldAffinities": {
+            "magic": 25,
+            "xianxia": 100,
+            "wuxia": 75
+          }
+        },
+        {
+          "id": "iron-stomach-alchemy",
+          "name": "Iron Stomach Alchemy",
+          "cost": 10,
+          "description": "Automatically purifies pill toxins and medicinal backlash, letting you consume raw spirit herbs and pills without side effects.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 50
+          }
+        },
+        {
+          "id": "iron-shirt-conditioning",
+          "name": "Iron Shirt Conditioning",
+          "cost": 20,
+          "description": "Circulates internal energy beneath your skin to make your body as hard as tempered steel against ordinary blades and arrows.",
+          "worldAffinities": {
+            "normal": 25,
+            "xianxia": 100,
+            "wuxia": 100
+          }
+        },
+        {
+          "id": "soul-fire-forge",
+          "name": "Soul-Fire Forge",
+          "cost": 20,
+          "description": "Manifests a unique internal flame ideal for refining high-grade alchemical pills or tempering sentient spirit weapons.",
+          "worldAffinities": {
+            "magic": 25,
+            "xianxia": 100,
+            "wuxia": 50
+          }
+        },
+        {
+          "id": "formation-eye",
+          "name": "Formation Eye",
+          "cost": 20,
+          "description": "Instantly sees the nodes and Qi flow within killing arrays and defensive formations to walk through or dismantle them.",
+          "worldAffinities": {
+            "magic": 25,
+            "xianxia": 100,
+            "wuxia": 50
+          }
+        },
+        {
+          "id": "meridian-reversal",
+          "name": "Meridian Reversal",
+          "cost": 40,
+          "description": "Temporarily inverts internal energy flow to double explosive strength and speed, or reflect enemy strikes with twice the force.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 100
+          }
+        },
+        {
+          "id": "heart-of-the-blade",
+          "name": "Heart of the Blade",
+          "cost": 40,
+          "description": "Achieves total unity with your weapon, letting you anticipate strikes before they happen and slice solid stone with standard steel.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 100,
+            "super": 50,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "sword-intent-manifestation",
+          "name": "Sword Intent Manifestation",
+          "cost": 40,
+          "description": "Reaches conceptual blade mastery, projecting invisible, armor-piercing sword energy from any object or your bare fingers.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 75,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "nirvana-rebirth-body",
+          "name": "Nirvana Rebirth Body",
+          "cost": 40,
+          "description": "Permanently evolves your flesh, bones, and Qi density to become exponentially stronger every time you survive near-death injuries.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 25,
+            "mythos": 75
+          }
+        },
+        {
+          "id": "return-to-uncarved-block",
+          "name": "Return to Uncarved Block",
+          "cost": 80,
+          "description": "Transcends rigid martial forms; every casual breath and step carries the full weight of your internal energy.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 100
+          }
+        },
+        {
+          "id": "chaos-dao-physique",
+          "name": "Chaos Dao Physique",
+          "cost": 80,
+          "description": "Comprehends cosmic laws simply by observing nature and seamlessly merges conflicting elemental energies into devastating attacks.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "wuxia": 25,
+            "game": 25,
+            "super": 25,
+            "mythos": 75
+          }
+        }
+      ]
+    },
+    {
+      "id": "divine-powers",
+      "title": "Powers: Divine & Mythic",
+      "description": "Sacred blessings, mythic authorities, fate manipulation, and legendary prowess.",
+      "mode": "multiple",
+      "items": [
+        {
+          "id": "omen-sight",
+          "name": "Omen Sight",
+          "cost": 10,
+          "description": "Reads the threads of fate in stars, flames, or water for cryptic but accurate glimpses of imminent danger or opportunity.",
+          "worldAffinities": {
+            "magic": 50,
+            "xianxia": 75,
+            "mythos": 100
+          }
+        },
+        {
+          "id": "relic-bearer",
+          "name": "Relic Bearer",
+          "cost": 20,
+          "description": "Cursed artifacts, divine weapons, and sentient treasures recognize you as worthy, waiving lethal drawbacks and unlocking true abilities.",
+          "worldAffinities": {
+            "magic": 50,
+            "xianxia": 75,
+            "wuxia": 25,
+            "mythos": 100
+          }
+        },
+        {
+          "id": "silver-tongued-bard",
+          "name": "Silver-Tongued Bard",
+          "cost": 20,
+          "description": "Infuses your voice with mythic enchantment to soothe raging monsters, bargain with trickster spirits, and inspire allies.",
+          "worldAffinities": {
+            "mythos": 100
+          }
+        },
+        {
+          "id": "monster-slayers-bane",
+          "name": "Monster Slayer's Bane",
+          "cost": 40,
+          "description": "Allows your attacks to bypass the mythic invulnerabilities, regeneration, and immortality clauses of legendary beasts and titans.",
+          "worldAffinities": {
+            "mythos": 100
+          }
+        },
+        {
+          "id": "heroic-labors",
+          "name": "Heroic Labors",
+          "cost": 40,
+          "description": "Scales up your physical might, speed, and endurance to match the legend whenever facing overwhelming armies or giants.",
+          "worldAffinities": {
+            "mythos": 100
+          }
+        },
+        {
+          "id": "apotheosis-spark",
+          "name": "Apotheosis Spark",
+          "cost": 80,
+          "description": "Grants a nascent divine domain of your choice, letting you draw power from mortal belief, grant blessings, and wield god-like authority.",
+          "worldAffinities": {
+            "xianxia": 75,
+            "game": 25,
+            "super": 25,
+            "mythos": 100
+          }
         }
       ]
     },
     {
       "id": "other-powers",
       "title": "Powers: Other",
-      "description": "Abilities that do not fit the other categories.",
+      "description": "System, meta, and utility abilities that do not fit the other categories.",
       "mode": "multiple",
       "items": [
         {
-          "id": "danger-sense",
-          "name": "Danger Sense",
-          "cost": 20,
-          "description": "Triggers a sharp instinct when targeted, watched with hostile intent, or approaching a trap."
-        },
-        {
-          "id": "luck-manipulation",
-          "name": "Luck Manipulation",
-          "cost": 30,
-          "description": "Subtly tilts everyday probabilities in your favor."
-        },
-        {
-          "id": "synergy-link",
-          "name": "Synergy Link",
-          "cost": 20,
-          "description": "Physical, mental, and magical abilities passively strengthen one another as you train."
-        },
-        {
-          "id": "skill-copy",
-          "name": "Skill Copy",
-          "cost": 25,
-          "description": "Learns the basics of a mundane skill or fighting style after watching someone perform it for a few minutes."
-        },
-        {
-          "id": "karma-ledger",
-          "name": "Karma Ledger",
-          "cost": 20,
-          "description": "Tracks moral alignment and hostile intent, showing a subtle aura around people who mean you harm."
-        },
-        {
-          "id": "save-state",
-          "name": "Save State",
-          "cost": 30,
-          "description": "Places one mental anchor per day and rewinds you to it if you make a fatal mistake."
-        },
-        {
           "id": "item-appraisal",
-          "name": "Item Appraisal",
+          "name": "Inspect / Appraisal",
           "cost": 10,
-          "description": "Displays hidden properties, durability, history, and weaknesses of inspected weapons, artifacts, or machines."
+          "description": "Displays status screens, skill lists, hidden properties, history, and weak points of any inspected item, monster, or person.",
+          "worldAffinities": {
+            "magic": 75,
+            "xianxia": 25,
+            "game": 100
+          }
         },
         {
           "id": "familiar-bond",
           "name": "Familiar Bond",
           "cost": 15,
-          "description": "Forms a telepathic link with a normal animal or small magical creature, sharing senses and helping it grow stronger."
+          "description": "Forms a telepathic link with a normal animal or small magical creature, sharing senses and helping it grow stronger.",
+          "worldAffinities": {
+            "magic": 75,
+            "game": 100,
+            "mythos": 100
+          }
+        },
+        {
+          "id": "danger-sense",
+          "name": "Danger Sense",
+          "cost": 20,
+          "description": "Triggers a sharp psychic warning a split second before any threat occurs, granting near-immunity to ambushes and traps.",
+          "worldAffinities": {
+            "normal": 50,
+            "wuxia": 75,
+            "game": 50,
+            "super": 100
+          }
+        },
+        {
+          "id": "synergy-link",
+          "name": "Synergy Link",
+          "cost": 20,
+          "description": "Physical, mental, and magical abilities passively strengthen one another as you train.",
+          "worldAffinities": {
+            "xianxia": 25,
+            "game": 100
+          }
+        },
+        {
+          "id": "karma-ledger",
+          "name": "Karma Ledger",
+          "cost": 20,
+          "description": "Tracks moral alignment and hostile intent, showing a subtle aura around people who mean you harm.",
+          "worldAffinities": {
+            "xianxia": 100,
+            "game": 100,
+            "mythos": 100
+          }
+        },
+        {
+          "id": "loot-magnet",
+          "name": "Loot Magnet",
+          "cost": 20,
+          "description": "Dramatically increases drop rates for rare items, gold, and hidden quest triggers from dungeons and bosses.",
+          "worldAffinities": {
+            "game": 100,
+            "super": 25
+          }
+        },
+        {
+          "id": "skill-synth",
+          "name": "Skill Synth",
+          "cost": 20,
+          "description": "Fuses two or more maxed-out active or passive skills together to create unique, higher-tier hybrid abilities.",
+          "worldAffinities": {
+            "game": 100,
+            "mythos": 25
+          }
+        },
+        {
+          "id": "skill-copy",
+          "name": "Skill Copy",
+          "cost": 25,
+          "description": "Learns the basics of a mundane skill or fighting style after watching someone perform it for a few minutes.",
+          "worldAffinities": {
+            "normal": 50,
+            "wuxia": 100,
+            "game": 100,
+            "super": 50
+          }
+        },
+        {
+          "id": "luck-manipulation",
+          "name": "Luck Manipulation",
+          "cost": 30,
+          "description": "Subtly tilts everyday probabilities in your favor.",
+          "worldAffinities": {
+            "xianxia": 25,
+            "game": 100,
+            "mythos": 100
+          }
+        },
+        {
+          "id": "save-state",
+          "name": "Save & Load Anchor",
+          "cost": 35,
+          "description": "Places one mental bookmark per day and reverts you back to that exact state and location if things go wrong.",
+          "worldAffinities": {
+            "game": 100,
+            "super": 25,
+            "mythos": 25
+          }
+        },
+        {
+          "id": "classless-versatility",
+          "name": "Classless Versatility",
+          "cost": 40,
+          "description": "Ignores all class, alignment, and stat prerequisites, allowing you to equip forbidden gear and learn mutually exclusive skills.",
+          "worldAffinities": {
+            "game": 100,
+            "mythos": 25
+          }
+        },
+        {
+          "id": "admin-console",
+          "name": "Admin Console",
+          "cost": 80,
+          "description": "Directly edits minor system parameters in your surroundings, such as altering gravity values, toggling collision, or rewriting status buffs.",
+          "worldAffinities": {
+            "game": 100,
+            "super": 25,
+            "mythos": 25
+          }
+        }
+      ]
+    },
+    {
+      "id": "local-power-talent",
+      "title": "Powers: Local Power Talent",
+      "description": "Choose your aptitude for powers native to the world you selected.",
+      "mode": "single",
+      "items": [
+        {
+          "id": "local-power-talent-minor",
+          "name": "Minor",
+          "cost": 10,
+          "description": "You have a minor natural aptitude for learning and using powers native to this world."
+        },
+        {
+          "id": "local-power-talent-moderate",
+          "name": "Moderate",
+          "cost": 20,
+          "description": "You have a moderate natural aptitude for learning and using powers native to this world."
+        },
+        {
+          "id": "local-power-talent-high",
+          "name": "High",
+          "cost": 40,
+          "description": "You have a high natural aptitude for learning and using powers native to this world."
+        },
+        {
+          "id": "local-power-talent-genius",
+          "name": "Genius",
+          "cost": 80,
+          "description": "You have genius-level natural aptitude for learning and using powers native to this world."
         }
       ]
     },
     {
       "id": "drawbacks",
       "title": "Drawbacks",
-      "description": "Optional complications. The source does not define point rewards or costs for these entries.",
+      "description": "Optional complications.",
       "mode": "multiple",
       "items": [
         {
@@ -1337,12 +1982,54 @@ window.KARMA_DATA = {
       "description": "Your facial appearance. Higher tiers require the listed allocated Constitution.",
       "mode": "single",
       "items": [
-        { "id": "appearance-face-mother", "name": "A Face Only a Mother Could Love", "cost": -5, "description": "An unusually unattractive face; gain 5 points." },
-        { "id": "appearance-face-plain", "name": "Plain", "cost": 0, "description": "An unremarkable, ordinary appearance." },
-        { "id": "appearance-face-pleasant", "name": "Pleasant", "cost": 0, "requiresStats": { "constitution": 6 }, "description": "A pleasant, appealing face. Requires 6 or more allocated Constitution." },
-        { "id": "appearance-face-striking", "name": "Striking", "cost": 0, "requiresStats": { "constitution": 8 }, "description": "Distinctive features that draw attention. Requires 8 or more allocated Constitution." },
-        { "id": "appearance-face-stunning", "name": "Stunning", "cost": 0, "requiresStats": { "constitution": 10 }, "description": "Exceptionally beautiful or handsome features. Requires 10 or more allocated Constitution." },
-        { "id": "appearance-face-godly", "name": "Godly", "cost": 0, "requiresStats": { "constitution": 11 }, "description": "An almost impossibly beautiful or handsome face. Requires 11 or more allocated Constitution." }
+        {
+          "id": "appearance-face-mother",
+          "name": "A Face Only a Mother Could Love",
+          "cost": -5,
+          "description": "An unusually unattractive face; gain 5 points."
+        },
+        {
+          "id": "appearance-face-plain",
+          "name": "Plain",
+          "cost": 0,
+          "description": "An unremarkable, ordinary appearance."
+        },
+        {
+          "id": "appearance-face-pleasant",
+          "name": "Pleasant",
+          "cost": 0,
+          "requiresStats": {
+            "constitution": 6
+          },
+          "description": "A pleasant, appealing face. Requires 6 or more allocated Constitution."
+        },
+        {
+          "id": "appearance-face-striking",
+          "name": "Striking",
+          "cost": 0,
+          "requiresStats": {
+            "constitution": 8
+          },
+          "description": "Distinctive features that draw attention. Requires 8 or more allocated Constitution."
+        },
+        {
+          "id": "appearance-face-stunning",
+          "name": "Stunning",
+          "cost": 0,
+          "requiresStats": {
+            "constitution": 10
+          },
+          "description": "Exceptionally beautiful or handsome features. Requires 10 or more allocated Constitution."
+        },
+        {
+          "id": "appearance-face-godly",
+          "name": "Godly",
+          "cost": 0,
+          "requiresStats": {
+            "constitution": 11
+          },
+          "description": "An almost impossibly beautiful or handsome face. Requires 11 or more allocated Constitution."
+        }
       ]
     },
     {
@@ -1351,14 +2038,66 @@ window.KARMA_DATA = {
       "description": "Your natural build. Athletic and muscular options require the listed allocated Strength.",
       "mode": "single",
       "items": [
-        { "id": "appearance-body-big-boned", "name": "Big-Boned", "cost": -10, "description": "A larger frame and hitbox that uses more energy; gain 10 points." },
-        { "id": "appearance-body-chubby", "name": "Chubby", "cost": -5, "description": "A softer build that uses more energy; gain 5 points." },
-        { "id": "appearance-body-thin", "name": "Thin", "cost": -5, "description": "A lean build that loses more fat than it should; gain 5 points." },
-        { "id": "appearance-body-average", "name": "Average", "cost": 0, "description": "An ordinary build with no notable extremes." },
-        { "id": "appearance-body-toned", "name": "Toned", "cost": 0, "requiresStats": { "strength": 6 }, "description": "A visibly fit, defined build. Requires 6 or more allocated Strength." },
-        { "id": "appearance-body-athletic", "name": "Athletic", "cost": 0, "requiresStats": { "strength": 8 }, "description": "A strong, athletic physique. Requires 8 or more allocated Strength." },
-        { "id": "appearance-body-muscular", "name": "Muscular", "cost": 0, "requiresStats": { "strength": 10 }, "description": "A heavily developed muscular build. Requires 10 or more allocated Strength." },
-        { "id": "appearance-body-adonis", "name": "Adonis", "cost": 0, "requiresStats": { "strength": 11 }, "description": "An exceptionally sculpted physique. Requires 11 or more allocated Strength." }
+        {
+          "id": "appearance-body-big-boned",
+          "name": "Big-Boned",
+          "cost": -10,
+          "description": "A larger frame and hitbox that uses more energy; gain 10 points."
+        },
+        {
+          "id": "appearance-body-chubby",
+          "name": "Chubby",
+          "cost": -5,
+          "description": "A softer build that uses more energy; gain 5 points."
+        },
+        {
+          "id": "appearance-body-thin",
+          "name": "Thin",
+          "cost": -5,
+          "description": "A lean build that loses more fat than it should; gain 5 points."
+        },
+        {
+          "id": "appearance-body-average",
+          "name": "Average",
+          "cost": 0,
+          "description": "An ordinary build with no notable extremes."
+        },
+        {
+          "id": "appearance-body-toned",
+          "name": "Toned",
+          "cost": 0,
+          "requiresStats": {
+            "strength": 6
+          },
+          "description": "A visibly fit, defined build. Requires 6 or more allocated Strength."
+        },
+        {
+          "id": "appearance-body-athletic",
+          "name": "Athletic",
+          "cost": 0,
+          "requiresStats": {
+            "strength": 8
+          },
+          "description": "A strong, athletic physique. Requires 8 or more allocated Strength."
+        },
+        {
+          "id": "appearance-body-muscular",
+          "name": "Muscular",
+          "cost": 0,
+          "requiresStats": {
+            "strength": 10
+          },
+          "description": "A heavily developed muscular build. Requires 10 or more allocated Strength."
+        },
+        {
+          "id": "appearance-body-adonis",
+          "name": "Adonis",
+          "cost": 0,
+          "requiresStats": {
+            "strength": 11
+          },
+          "description": "An exceptionally sculpted physique. Requires 11 or more allocated Strength."
+        }
       ]
     },
     {
@@ -1367,12 +2106,42 @@ window.KARMA_DATA = {
       "description": "Choose your stature, or randomize it.",
       "mode": "single",
       "items": [
-        { "id": "appearance-height-diminutive", "name": "Diminutive", "cost": 0, "description": "Noticeably tiny stature, well under five feet tall with compact proportions." },
-        { "id": "appearance-height-short", "name": "Short", "cost": 0, "description": "Below average height, roughly between 5'0\" and 5'4\"." },
-        { "id": "appearance-height-average", "name": "Average", "cost": 0, "description": "Standard, middle-of-the-road height, roughly between 5'5\" and 5'10\"." },
-        { "id": "appearance-height-tall", "name": "Tall", "cost": 0, "description": "Above average stature with longer limbs, roughly between 5'11\" and 6'3\"." },
-        { "id": "appearance-height-towering", "name": "Towering", "cost": 0, "description": "Imposing, head-and-shoulders taller than most people, around 6'4\" to 6'10\"." },
-        { "id": "appearance-height-gigantic", "name": "Gigantic", "cost": 0, "description": "Massive, near-superhuman height exceeding seven feet tall." }
+        {
+          "id": "appearance-height-diminutive",
+          "name": "Diminutive",
+          "cost": 0,
+          "description": "Noticeably tiny stature, well under five feet tall with compact proportions."
+        },
+        {
+          "id": "appearance-height-short",
+          "name": "Short",
+          "cost": 0,
+          "description": "Below average height, roughly between 5'0\" and 5'4\"."
+        },
+        {
+          "id": "appearance-height-average",
+          "name": "Average",
+          "cost": 0,
+          "description": "Standard, middle-of-the-road height, roughly between 5'5\" and 5'10\"."
+        },
+        {
+          "id": "appearance-height-tall",
+          "name": "Tall",
+          "cost": 0,
+          "description": "Above average stature with longer limbs, roughly between 5'11\" and 6'3\"."
+        },
+        {
+          "id": "appearance-height-towering",
+          "name": "Towering",
+          "cost": 0,
+          "description": "Imposing, head-and-shoulders taller than most people, around 6'4\" to 6'10\"."
+        },
+        {
+          "id": "appearance-height-gigantic",
+          "name": "Gigantic",
+          "cost": 0,
+          "description": "Massive, near-superhuman height exceeding seven feet tall."
+        }
       ]
     },
     {
@@ -1381,20 +2150,90 @@ window.KARMA_DATA = {
       "description": "Choose your hair color.",
       "mode": "single",
       "items": [
-        { "id": "appearance-hair-jet-black", "name": "Jet Black", "cost": 0, "description": "Deep, pure black that absorbs light with a subtle dark sheen." },
-        { "id": "appearance-hair-dark-brown", "name": "Dark Brown", "cost": 0, "description": "Rich, earthy espresso or chocolate tones." },
-        { "id": "appearance-hair-light-brown", "name": "Light Brown", "cost": 0, "description": "Warm chestnut, hazel, or soft caramel shades." },
-        { "id": "appearance-hair-dirty-blonde", "name": "Dirty Blonde", "cost": 0, "description": "Muted, sandy mix of light brown and dull gold." },
-        { "id": "appearance-hair-golden-blonde", "name": "Golden Blonde", "cost": 0, "description": "Bright, warm yellow-gold strands that catch the sunlight." },
-        { "id": "appearance-hair-platinum-blonde", "name": "Platinum Blonde", "cost": 0, "description": "Pale, icy near-white blonde with a cool silver tint." },
-        { "id": "appearance-hair-auburn", "name": "Auburn", "cost": 0, "description": "Deep reddish-brown with warm copper undertones." },
-        { "id": "appearance-hair-ginger", "name": "Ginger", "cost": 0, "description": "Vibrant, fiery orange-red tones." },
-        { "id": "appearance-hair-silver", "name": "Silver", "cost": 0, "description": "Sleek, metallic gray-white with a cool sheen." },
-        { "id": "appearance-hair-snow-white", "name": "Snow White", "cost": 0, "description": "Pure, stark white completely devoid of pigment." },
-        { "id": "appearance-hair-pastel", "name": "Pastel", "cost": 0, "description": "Soft, muted shades like baby pink, lavender, or mint." },
-        { "id": "appearance-hair-neon", "name": "Neon", "cost": 0, "description": "Bright, hyper-saturated colors like electric blue, crimson, or lime." },
-        { "id": "appearance-hair-ombre", "name": "Ombre", "cost": 0, "description": "Gradually fades from a darker shade at the roots to a lighter or contrasting color at the tips." },
-        { "id": "appearance-hair-streaked", "name": "Streaked", "cost": 0, "description": "Base hair color accented with bold, contrasting highlights or strands." }
+        {
+          "id": "appearance-hair-jet-black",
+          "name": "Jet Black",
+          "cost": 0,
+          "description": "Deep, pure black that absorbs light with a subtle dark sheen."
+        },
+        {
+          "id": "appearance-hair-dark-brown",
+          "name": "Dark Brown",
+          "cost": 0,
+          "description": "Rich, earthy espresso or chocolate tones."
+        },
+        {
+          "id": "appearance-hair-light-brown",
+          "name": "Light Brown",
+          "cost": 0,
+          "description": "Warm chestnut, hazel, or soft caramel shades."
+        },
+        {
+          "id": "appearance-hair-dirty-blonde",
+          "name": "Dirty Blonde",
+          "cost": 0,
+          "description": "Muted, sandy mix of light brown and dull gold."
+        },
+        {
+          "id": "appearance-hair-golden-blonde",
+          "name": "Golden Blonde",
+          "cost": 0,
+          "description": "Bright, warm yellow-gold strands that catch the sunlight."
+        },
+        {
+          "id": "appearance-hair-platinum-blonde",
+          "name": "Platinum Blonde",
+          "cost": 0,
+          "description": "Pale, icy near-white blonde with a cool silver tint."
+        },
+        {
+          "id": "appearance-hair-auburn",
+          "name": "Auburn",
+          "cost": 0,
+          "description": "Deep reddish-brown with warm copper undertones."
+        },
+        {
+          "id": "appearance-hair-ginger",
+          "name": "Ginger",
+          "cost": 0,
+          "description": "Vibrant, fiery orange-red tones."
+        },
+        {
+          "id": "appearance-hair-silver",
+          "name": "Silver",
+          "cost": 0,
+          "description": "Sleek, metallic gray-white with a cool sheen."
+        },
+        {
+          "id": "appearance-hair-snow-white",
+          "name": "Snow White",
+          "cost": 0,
+          "description": "Pure, stark white completely devoid of pigment."
+        },
+        {
+          "id": "appearance-hair-pastel",
+          "name": "Pastel",
+          "cost": 0,
+          "description": "Soft, muted shades like baby pink, lavender, or mint."
+        },
+        {
+          "id": "appearance-hair-neon",
+          "name": "Neon",
+          "cost": 0,
+          "description": "Bright, hyper-saturated colors like electric blue, crimson, or lime."
+        },
+        {
+          "id": "appearance-hair-ombre",
+          "name": "Ombre",
+          "cost": 0,
+          "description": "Gradually fades from a darker shade at the roots to a lighter or contrasting color at the tips."
+        },
+        {
+          "id": "appearance-hair-streaked",
+          "name": "Streaked",
+          "cost": 0,
+          "description": "Base hair color accented with bold, contrasting highlights or strands."
+        }
       ]
     },
     {
@@ -1403,16 +2242,66 @@ window.KARMA_DATA = {
       "description": "Choose your hairstyle or hair texture.",
       "mode": "single",
       "items": [
-        { "id": "appearance-hair-type-bald", "name": "Bald", "cost": 0, "description": "Completely smooth and hairless scalp." },
-        { "id": "appearance-hair-type-buzzed", "name": "Buzzed", "cost": 0, "description": "Very closely cropped, uniform stubble covering the head." },
-        { "id": "appearance-hair-type-short", "name": "Short", "cost": 0, "description": "Trimmed neat and close, stopping above the ears and collar." },
-        { "id": "appearance-hair-type-styled", "name": "Styled", "cost": 0, "description": "Carefully shaped, parted, or sculpted into a deliberate cut." },
-        { "id": "appearance-hair-type-long", "name": "Long", "cost": 0, "description": "Flowing strands that reach down past the shoulders or back." },
-        { "id": "appearance-hair-type-spiky", "name": "Spiky", "cost": 0, "description": "Sharp, pointed tufts standing upright or outward in jagged angles." },
-        { "id": "appearance-hair-type-curly", "name": "Curly", "cost": 0, "description": "Dense, springy ringlets and tight spirals with plenty of volume." },
-        { "id": "appearance-hair-type-wavy", "name": "Wavy", "cost": 0, "description": "Soft, loose S-shaped bends that fall naturally around the face." },
-        { "id": "appearance-hair-type-braided", "name": "Braided", "cost": 0, "description": "Woven neatly into tight plaits, cornrows, or intricate locks." },
-        { "id": "appearance-hair-type-messy", "name": "Messy", "cost": 0, "description": "Tousled, uneven strands falling in loose, untamed layers." }
+        {
+          "id": "appearance-hair-type-bald",
+          "name": "Bald",
+          "cost": 0,
+          "description": "Completely smooth and hairless scalp."
+        },
+        {
+          "id": "appearance-hair-type-buzzed",
+          "name": "Buzzed",
+          "cost": 0,
+          "description": "Very closely cropped, uniform stubble covering the head."
+        },
+        {
+          "id": "appearance-hair-type-short",
+          "name": "Short",
+          "cost": 0,
+          "description": "Trimmed neat and close, stopping above the ears and collar."
+        },
+        {
+          "id": "appearance-hair-type-styled",
+          "name": "Styled",
+          "cost": 0,
+          "description": "Carefully shaped, parted, or sculpted into a deliberate cut."
+        },
+        {
+          "id": "appearance-hair-type-long",
+          "name": "Long",
+          "cost": 0,
+          "description": "Flowing strands that reach down past the shoulders or back."
+        },
+        {
+          "id": "appearance-hair-type-spiky",
+          "name": "Spiky",
+          "cost": 0,
+          "description": "Sharp, pointed tufts standing upright or outward in jagged angles."
+        },
+        {
+          "id": "appearance-hair-type-curly",
+          "name": "Curly",
+          "cost": 0,
+          "description": "Dense, springy ringlets and tight spirals with plenty of volume."
+        },
+        {
+          "id": "appearance-hair-type-wavy",
+          "name": "Wavy",
+          "cost": 0,
+          "description": "Soft, loose S-shaped bends that fall naturally around the face."
+        },
+        {
+          "id": "appearance-hair-type-braided",
+          "name": "Braided",
+          "cost": 0,
+          "description": "Woven neatly into tight plaits, cornrows, or intricate locks."
+        },
+        {
+          "id": "appearance-hair-type-messy",
+          "name": "Messy",
+          "cost": 0,
+          "description": "Tousled, uneven strands falling in loose, untamed layers."
+        }
       ]
     },
     {
@@ -1421,18 +2310,78 @@ window.KARMA_DATA = {
       "description": "Choose your eye color.",
       "mode": "single",
       "items": [
-        { "id": "appearance-eyes-obsidian", "name": "Obsidian", "cost": 0, "description": "Deep, near-black irises where the pupil barely stands out." },
-        { "id": "appearance-eyes-dark-brown", "name": "Dark Brown", "cost": 0, "description": "Rich, warm chocolate or coffee tones." },
-        { "id": "appearance-eyes-amber", "name": "Amber", "cost": 0, "description": "Glowing, golden-brown or copper irises with warm depth." },
-        { "id": "appearance-eyes-hazel", "name": "Hazel", "cost": 0, "description": "Blended mix of green, gold, and light brown flecks." },
-        { "id": "appearance-eyes-emerald", "name": "Emerald", "cost": 0, "description": "Vivid, jewel-toned green irises." },
-        { "id": "appearance-eyes-ice-blue", "name": "Ice Blue", "cost": 0, "description": "Pale, crystalline blue with a cool, translucent look." },
-        { "id": "appearance-eyes-sapphire", "name": "Sapphire", "cost": 0, "description": "Deep, saturated ocean blue." },
-        { "id": "appearance-eyes-slate-gray", "name": "Slate Gray", "cost": 0, "description": "Cool, smoky silver-gray irises." },
-        { "id": "appearance-eyes-violet", "name": "Violet", "cost": 0, "description": "Rare, soft purple or lavender-tinted irises." },
-        { "id": "appearance-eyes-crimson", "name": "Crimson", "cost": 0, "description": "Striking, vivid red irises." },
-        { "id": "appearance-eyes-heterochromia", "name": "Heterochromia", "cost": 0, "description": "Two distinctly different colored irises, or a ring of contrasting color around the pupil." },
-        { "id": "appearance-eyes-rainbow", "name": "Rainbow", "cost": 0, "description": "Eyes that sparkle in different shades of color; they are sure to attract attention." }
+        {
+          "id": "appearance-eyes-obsidian",
+          "name": "Obsidian",
+          "cost": 0,
+          "description": "Deep, near-black irises where the pupil barely stands out."
+        },
+        {
+          "id": "appearance-eyes-dark-brown",
+          "name": "Dark Brown",
+          "cost": 0,
+          "description": "Rich, warm chocolate or coffee tones."
+        },
+        {
+          "id": "appearance-eyes-amber",
+          "name": "Amber",
+          "cost": 0,
+          "description": "Glowing, golden-brown or copper irises with warm depth."
+        },
+        {
+          "id": "appearance-eyes-hazel",
+          "name": "Hazel",
+          "cost": 0,
+          "description": "Blended mix of green, gold, and light brown flecks."
+        },
+        {
+          "id": "appearance-eyes-emerald",
+          "name": "Emerald",
+          "cost": 0,
+          "description": "Vivid, jewel-toned green irises."
+        },
+        {
+          "id": "appearance-eyes-ice-blue",
+          "name": "Ice Blue",
+          "cost": 0,
+          "description": "Pale, crystalline blue with a cool, translucent look."
+        },
+        {
+          "id": "appearance-eyes-sapphire",
+          "name": "Sapphire",
+          "cost": 0,
+          "description": "Deep, saturated ocean blue."
+        },
+        {
+          "id": "appearance-eyes-slate-gray",
+          "name": "Slate Gray",
+          "cost": 0,
+          "description": "Cool, smoky silver-gray irises."
+        },
+        {
+          "id": "appearance-eyes-violet",
+          "name": "Violet",
+          "cost": 0,
+          "description": "Rare, soft purple or lavender-tinted irises."
+        },
+        {
+          "id": "appearance-eyes-crimson",
+          "name": "Crimson",
+          "cost": 0,
+          "description": "Striking, vivid red irises."
+        },
+        {
+          "id": "appearance-eyes-heterochromia",
+          "name": "Heterochromia",
+          "cost": 0,
+          "description": "Two distinctly different colored irises, or a ring of contrasting color around the pupil."
+        },
+        {
+          "id": "appearance-eyes-rainbow",
+          "name": "Rainbow",
+          "cost": 0,
+          "description": "Eyes that sparkle in different shades of color; they are sure to attract attention."
+        }
       ]
     },
     {
@@ -1441,14 +2390,54 @@ window.KARMA_DATA = {
       "description": "Choose your eye shape.",
       "mode": "single",
       "items": [
-        { "id": "appearance-eye-shape-almond", "name": "Almond", "cost": 0, "description": "Balanced, oval shape that tapers neatly at both corners." },
-        { "id": "appearance-eye-shape-round", "name": "Round", "cost": 0, "description": "Large, open, and circular with visible white above or below the iris." },
-        { "id": "appearance-eye-shape-hooded", "name": "Hooded", "cost": 0, "description": "Heavy upper brow bone that partially folds over the eyelid crease." },
-        { "id": "appearance-eye-shape-monolid", "name": "Monolid", "cost": 0, "description": "Smooth upper lid surface without a defined crease." },
-        { "id": "appearance-eye-shape-upturned", "name": "Upturned", "cost": 0, "description": "Outer corners lift slightly upward, creating a subtle cat-eye tilt." },
-        { "id": "appearance-eye-shape-downturned", "name": "Downturned", "cost": 0, "description": "Outer corners angle gently downward for a softer, sloped line." },
-        { "id": "appearance-eye-shape-deep-set", "name": "Deep-Set", "cost": 0, "description": "Positioned further back under a prominent brow ridge." },
-        { "id": "appearance-eye-shape-narrow", "name": "Narrow", "cost": 0, "description": "Sleek, sharp, and horizontally elongated with a focused look." }
+        {
+          "id": "appearance-eye-shape-almond",
+          "name": "Almond",
+          "cost": 0,
+          "description": "Balanced, oval shape that tapers neatly at both corners."
+        },
+        {
+          "id": "appearance-eye-shape-round",
+          "name": "Round",
+          "cost": 0,
+          "description": "Large, open, and circular with visible white above or below the iris."
+        },
+        {
+          "id": "appearance-eye-shape-hooded",
+          "name": "Hooded",
+          "cost": 0,
+          "description": "Heavy upper brow bone that partially folds over the eyelid crease."
+        },
+        {
+          "id": "appearance-eye-shape-monolid",
+          "name": "Monolid",
+          "cost": 0,
+          "description": "Smooth upper lid surface without a defined crease."
+        },
+        {
+          "id": "appearance-eye-shape-upturned",
+          "name": "Upturned",
+          "cost": 0,
+          "description": "Outer corners lift slightly upward, creating a subtle cat-eye tilt."
+        },
+        {
+          "id": "appearance-eye-shape-downturned",
+          "name": "Downturned",
+          "cost": 0,
+          "description": "Outer corners angle gently downward for a softer, sloped line."
+        },
+        {
+          "id": "appearance-eye-shape-deep-set",
+          "name": "Deep-Set",
+          "cost": 0,
+          "description": "Positioned further back under a prominent brow ridge."
+        },
+        {
+          "id": "appearance-eye-shape-narrow",
+          "name": "Narrow",
+          "cost": 0,
+          "description": "Sleek, sharp, and horizontally elongated with a focused look."
+        }
       ]
     },
     {
@@ -1457,15 +2446,60 @@ window.KARMA_DATA = {
       "description": "Choose your teeth.",
       "mode": "single",
       "items": [
-        { "id": "appearance-teeth-straight", "name": "Straight", "cost": 0, "description": "Evenly aligned, smooth, and uniform rows of flat-edged teeth." },
-        { "id": "appearance-teeth-slightly-crooked", "name": "Slightly Crooked", "cost": 0, "description": "Natural, minor overlaps or subtle tilts that break up uniform symmetry." },
-        { "id": "appearance-teeth-gapped", "name": "Gapped", "cost": 0, "description": "Distinct, small spaces between the front or side teeth." },
-        { "id": "appearance-teeth-buck", "name": "Buck", "cost": 0, "description": "Prominent, slightly oversized upper front teeth that rest noticeably forward." },
-        { "id": "appearance-teeth-snaggletooth", "name": "Snaggletooth", "cost": 0, "description": "A single crooked or overlapping canine that juts out slightly when smiling." },
-        { "id": "appearance-teeth-single-fang", "name": "Single Fang", "cost": 0, "description": "One subtly pointed canine tooth that peeks out even when the mouth is closed." },
-        { "id": "appearance-teeth-vampire", "name": "Vampire", "cost": 0, "description": "Two sleek, elongated, and razor-pointed upper canines among otherwise normal teeth." },
-        { "id": "appearance-teeth-sharp", "name": "Sharp", "cost": 0, "description": "Every tooth tapers to a fine, jagged, triangular point like a shark or predator." },
-        { "id": "appearance-teeth-tusks", "name": "Tusks", "cost": 0, "description": "Thick, curved lower canines that jut upward past the bottom lip." }
+        {
+          "id": "appearance-teeth-straight",
+          "name": "Straight",
+          "cost": 0,
+          "description": "Evenly aligned, smooth, and uniform rows of flat-edged teeth."
+        },
+        {
+          "id": "appearance-teeth-slightly-crooked",
+          "name": "Slightly Crooked",
+          "cost": 0,
+          "description": "Natural, minor overlaps or subtle tilts that break up uniform symmetry."
+        },
+        {
+          "id": "appearance-teeth-gapped",
+          "name": "Gapped",
+          "cost": 0,
+          "description": "Distinct, small spaces between the front or side teeth."
+        },
+        {
+          "id": "appearance-teeth-buck",
+          "name": "Buck",
+          "cost": 0,
+          "description": "Prominent, slightly oversized upper front teeth that rest noticeably forward."
+        },
+        {
+          "id": "appearance-teeth-snaggletooth",
+          "name": "Snaggletooth",
+          "cost": 0,
+          "description": "A single crooked or overlapping canine that juts out slightly when smiling."
+        },
+        {
+          "id": "appearance-teeth-single-fang",
+          "name": "Single Fang",
+          "cost": 0,
+          "description": "One subtly pointed canine tooth that peeks out even when the mouth is closed."
+        },
+        {
+          "id": "appearance-teeth-vampire",
+          "name": "Vampire",
+          "cost": 0,
+          "description": "Two sleek, elongated, and razor-pointed upper canines among otherwise normal teeth."
+        },
+        {
+          "id": "appearance-teeth-sharp",
+          "name": "Sharp",
+          "cost": 0,
+          "description": "Every tooth tapers to a fine, jagged, triangular point like a shark or predator."
+        },
+        {
+          "id": "appearance-teeth-tusks",
+          "name": "Tusks",
+          "cost": 0,
+          "description": "Thick, curved lower canines that jut upward past the bottom lip."
+        }
       ]
     }
   ],
@@ -1473,7 +2507,6 @@ window.KARMA_DATA = {
     "starting": 30,
     "description": "Allocate points, your default starts at 30 stat points. One karma point buys one stat point. average stat is 5 and 10 is a super-genius level, above 10 is beyond genius. these Attributes represents your potential and what you can achieve by doing nothing special but doing something special like training allows you to reach it faster.",
     "attributes": [
-
       {
         "id": "constitution",
         "name": "Constitution",
@@ -1494,7 +2527,6 @@ window.KARMA_DATA = {
         "name": "Agility",
         "description": "The ability to move quickly."
       },
-      
       {
         "id": "perception",
         "name": "Perception",

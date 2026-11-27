@@ -8,11 +8,19 @@ let attributePointsSold = Number(localStorage.getItem("karma-attribute-points-so
 let appearanceEthnicity = localStorage.getItem("karma-appearance-ethnicity") || "";
 const openGroups = new Set(), openSections = new Set();
 let statsOpen = false;
-function addDefaultModifiers(content) {
+function addDefaultChoiceMetadata(content) {
     const defaultItems = new Map(DEFAULT.sections.flatMap(section => section.items.map(item => [item.id, item])));
     content.sections?.forEach(section => section.items?.forEach(item => {
         const source = defaultItems.get(item.id);
         if (item.modifiers === undefined && source?.modifiers) item.modifiers = clone(source.modifiers);
+        if (item.worldAffinities === undefined && source?.worldAffinities) item.worldAffinities = clone(source.worldAffinities);
+        if (item.localToWorlds) {
+            item.worldAffinities = item.worldAffinities || {};
+            item.localToWorlds.forEach(worldId => {
+                item.worldAffinities[worldId] = 100;
+            });
+            delete item.localToWorlds;
+        }
     }));
     const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
     if (ethnicity) ethnicity.items = [];
@@ -67,7 +75,7 @@ function loadData() {
         const base = localStorage.getItem("karma-data-base");
         const previousDefaults = base ? JSON.parse(base) : null;
         const localContent = saved ? migratePatronSections(JSON.parse(saved)) : clone(DEFAULT);
-        const content = placePatronAfterPast(addDefaultModifiers(saved
+        const content = placePatronAfterPast(addDefaultChoiceMetadata(saved
             ? window.KARMA_CONTENT_SYNC.merge(DEFAULT, localContent, previousDefaults)
             : localContent));
         localStorage.setItem("karma-data", JSON.stringify(content));
@@ -85,7 +93,31 @@ function save() {
     localStorage.setItem("karma-appearance-ethnicity", appearanceEthnicity);
 }
 function escapeHTML(s = "") { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-function costLabel(n) { return n > 0 ? `−${n} pts` : n < 0 ? `+${Math.abs(n)} pts` : "Free" }
+function formatCost(value) { return String(Number(value.toFixed(3))) }
+function costLabel(n) { return n > 0 ? `−${formatCost(n)} pts` : n < 0 ? `+${formatCost(Math.abs(n))} pts` : "Free" }
+function selectedWorldType() {
+    const section = data.sections.find(item => item.id === "world-type");
+    return section?.items.find(item => selected.has(item.id));
+}
+function worldAffinity(item, worldId = selectedWorldType()?.id) {
+    const affinity = Number(item.worldAffinities?.[worldId]) || 0;
+    return Math.max(0, Math.min(100, affinity));
+}
+function hasLocalPowerAffinity(section, item) {
+    return section.id.endsWith("-powers") && worldAffinity(item) > 0;
+}
+function hasLocalPowerDiscount(section, item) {
+    return hasLocalPowerAffinity(section, item) && Number(item.cost) > 0;
+}
+function displayedCost(section, item) {
+    const cost = effectiveCost(section, item);
+    if (!hasLocalPowerAffinity(section, item)) return costLabel(cost);
+    const affinity = worldAffinity(item);
+    const discount = hasLocalPowerDiscount(section, item) ? affinity / 2 : 0;
+    const affinityLabel = Number.isInteger(affinity) ? affinity : affinity.toFixed(1);
+    const discountLabel = Number.isInteger(discount) ? discount : discount.toFixed(1);
+    return `${costLabel(cost)} · Local (${affinityLabel}% affinity${discount ? `, ${discountLabel}% off` : ""})`;
+}
 function selectedPatron() {
     const section = data.sections.find(item => item.id === "patron-choices");
     return section?.items.find(item => selected.has(item.id));
@@ -96,6 +128,7 @@ function selectedAlignment() {
 function sectionAvailable(section) {
     const patron = selectedPatron();
     const alignment = selectedAlignment();
+    if (section.id === "local-power-talent" && !selectedWorldType()) return false;
     if (section.requiresPatron === true && !patron) return false;
     if (typeof section.requiresPatron === "string" && section.requiresPatron !== patron?.id) return false;
     if (section.requiresAlignment === true && !alignment) return false;
@@ -170,11 +203,14 @@ function clearUnavailableSelections() {
 }
 function effectiveCost(section, item) {
     const cost = Number(item.cost) || 0;
-    if (section.id !== "karma") return cost;
+    const discountedCost = hasLocalPowerDiscount(section, item)
+        ? Math.floor(cost * (1 - worldAffinity(item) / 200))
+        : cost;
+    if (section.id !== "karma") return discountedCost;
     const alignment = selectedPatron()?.alignment;
-    if (alignment === "evil") return -cost;
-    if (alignment === "good" && cost < 0) return cost * 2;
-    return cost;
+    if (alignment === "evil") return -discountedCost;
+    if (alignment === "good" && discountedCost < 0) return discountedCost * 2;
+    return discountedCost;
 }
 function selectedCost() {
     let total = 0;
@@ -198,12 +234,36 @@ function allocatedStats() {
 function availableAttributePoints() { return Math.max(0, (Number(data.stats?.starting) || 0) + attributePointsBought - attributePointsSold - allocatedStats()) }
 function availableKarma() { return points - selectedCost() - attributePointsBought + attributePointsSold }
 function constitutionValue() { return Math.max(0, Number(stats.constitution) || 0) * statMultiplier("constitution") }
-function statLimit(attribute) { return attribute.id === "constitution" ? Infinity : constitutionValue() * 2 }
+function breaksStatLimits(selectedChoices = selected) {
+    return data.sections.some(section => section.items.some(item =>
+        item.breaksStatLimits && selectedChoices.has(item.id)
+    ));
+}
+function statLimit(attribute, selectedChoices = selected) {
+    return attribute.id === "constitution" || breaksStatLimits(selectedChoices) ? Infinity : constitutionValue() * 2;
+}
+function allocationsWithinStatLimits(selectedChoices = selected) {
+    return (data.stats?.attributes || []).every(attribute =>
+        attribute.id === "constitution" || (Number(stats[attribute.id]) || 0) <= statLimit(attribute, selectedChoices)
+    );
+}
 function canDecreaseConstitution() {
     const newLimit = Math.max(0, (Number(stats.constitution) || 0) - 1) * statMultiplier("constitution") * 2;
-    return (data.stats?.attributes || []).every(attribute =>
+    return breaksStatLimits() || (data.stats?.attributes || []).every(attribute =>
         attribute.id === "constitution" || (Number(stats[attribute.id]) || 0) <= newLimit
     );
+}
+function statTier(value) {
+    if (value < 5) return { name: "Slow", description: "Building the foundation—consistent practice is key." };
+    if (value < 6) return { name: "Average", description: "This is average; a solid baseline with steady room to grow." };
+    if (value < 8) return { name: "Above Average", description: "Above average—sharp instincts that respond well to focused work." };
+    if (value < 10) return { name: "Talented", description: "Talented; natural aptitude is clear and progress comes quickly." };
+    if (value < 11) return { name: "Genius", description: "Genius—training will result in soaring results." };
+    if (value < 21) return { name: "Monster", description: "A true monster; operates far beyond standard human limits." };
+    if (value < 41) return { name: "Apex", description: "Apex predator—dominates the field with overwhelming superiority." };
+    if (value < 81) return { name: "Anomaly", description: "An anomaly—breaks every metric and rewrites what is possible." };
+    if (value < 161) return { name: "Myth", description: "A living myth—legendary capability whispered about across worlds." };
+    return { name: "Singularity", description: "Singularity—transcends the scale entirely; a force unto itself." };
 }
 function render() {
     const q = ($("#search")?.value || "").toLowerCase();
@@ -211,7 +271,9 @@ function render() {
     $("#selected-count").textContent = selected.size;
     $("#attribute-points").textContent = availableAttributePoints();
     const groups = new Map();
-    data.sections.filter(sectionVisible).filter(section => !section.id.startsWith("appearance-")).forEach(sec => {
+    data.sections.filter(sectionVisible).filter(section =>
+        !section.id.startsWith("appearance-") && section.id !== "local-power-talent"
+    ).forEach(sec => {
         const title = sec.title || "";
         const group = title.startsWith("Background:") ? ["background", "Background"]
             : title.startsWith("World:") ? ["world", "World"]
@@ -223,9 +285,40 @@ function render() {
         if (!groups.has(group[0])) groups.set(group[0], { title: group[1], sections: [] });
         groups.get(group[0]).sections.push(sec);
     });
-    $("#sections").innerHTML = [...groups.entries()].map(([key, group]) => {
+    const world = selectedWorldType();
+    if (world && groups.has("powers")) {
+        const localItems = data.sections
+            .filter(section => section.id.endsWith("-powers"))
+            .flatMap(section => section.items
+                .filter(item => worldAffinity(item, world.id) > 0)
+                .map(item => ({ section, item })));
+        groups.get("powers").sections.unshift({
+            id: "local-powers",
+            title: "Powers: Local",
+            description: `Powers with an affinity for the ${world.name}. Higher affinity means a larger discount, up to 50%. Choose one here to select the same power in its regular category.`,
+            mode: "multiple",
+            items: localItems.map(({ item }) => item)
+        });
+    }
+    const renderGroup = (key, group) => {
         const sections = group.sections.map(sec => {
             if (sec.id === "patron-choices") return "";
+            const localTalent = sec.id === "local-powers"
+                ? data.sections.find(section => section.id === "local-power-talent")
+                : null;
+            const localTalentQuery = "local power talent";
+            const showLocalTalent = localTalent && (!q || localTalentQuery.includes(q)
+                || localTalent.items.some(item => `${item.name} ${item.description}`.toLowerCase().includes(q)));
+            const localTalentExpanded = showLocalTalent
+                && (openSections.has("local-power-talent") || Boolean(q));
+            const localTalentSelectedCount = localTalent?.items.filter(item => selected.has(item.id)).length || 0;
+            const localTalentItems = localTalent?.items.filter(item =>
+                itemAvailable(localTalent, item)
+                && (!q || `${item.name} ${item.description}`.toLowerCase().includes(q))
+            ) || [];
+            const localTalentMarkup = showLocalTalent
+                ? `<section class="section subsection local-talent-section" id="local-power-talent"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${localTalentExpanded}" aria-controls="content-local-power-talent"><span class="section-toggle-main"><span class="section-toggle-title">Local Power Talent</span><span class="section-toggle-meta">Choose one${localTalentSelectedCount ? ` · ${localTalentSelectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${localTalentExpanded ? "−" : "+"}</span></button><div class="section-content" id="content-local-power-talent" ${localTalentExpanded ? "" : "hidden"}><p class="desc">Choose your talent for powers native to the ${escapeHTML(world?.name || "selected world")}. This represents aptitude, not an automatic purchase of a power.</p>${localTalentExpanded ? `<div class="grid">${localTalentItems.map(item => renderCard(localTalent, item)).join("")}</div>` : ""}</div></section>`
+                : "";
             if (sec.id === "patron-alignment") {
                 const patronSection = data.sections.find(section => section.id === "patron-choices");
                 const youPatron = patronSection?.items.find(item => item.id === "patron-you");
@@ -256,7 +349,10 @@ function render() {
                 return `<section class="section subsection" id="${escapeHTML(sec.id)}"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(sec.title.replace(/^Patron:\s*/, ""))}</span><span class="section-toggle-meta">Choose one${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}><p class="desc">${escapeHTML(sec.description || "")}</p>${youChoice}${alignmentAccordions}</div></section>`;
             }
             const items = sec.items.filter(i => itemAvailable(sec, i) && (i.name + " " + i.description).toLowerCase().includes(q));
-            if (!items.length && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
+            if (sec.id.endsWith("-powers") || sec.id === "local-powers") {
+                items.sort((a, b) => effectiveCost(sec, a) - effectiveCost(sec, b));
+            }
+            if (!items.length && !showLocalTalent && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
             const standalone = group.sections.length === 1 && key !== "patron";
             const expanded = (standalone ? openGroups.has(key) : openSections.has(sec.id)) || Boolean(q);
             const selectedCount = sec.items.filter(item => itemAvailable(sec, item) && selected.has(item.id)).length;
@@ -269,7 +365,7 @@ function render() {
                 : sec.id === "patron-missions" && selectedAlignment()?.alignment !== "neutral"
                     ? selectedPatron() ? "Missions are only available to Neutral patrons." : "Choose a Neutral alignment and patron to unlock missions."
                     : "";
-            return `<section class="section ${standalone ? "" : "subsection"}" id="${escapeHTML(sec.id)}"><button class="section-toggle ${toggleClass}" type="button" ${toggleData} aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(title)}</span><span class="section-toggle-meta">${sec.mode === "single" ? "Choose one" : "Choose any"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}>${randomizer}<p class="desc">${escapeHTML(sec.description || "")}</p>${unavailableMessage ? `<p class="desc">${escapeHTML(unavailableMessage)}</p>` : `<div class="grid">${items.map(item => {
+            return `<section class="section ${standalone ? "" : "subsection"}" id="${escapeHTML(sec.id)}"><button class="section-toggle ${toggleClass}" type="button" ${toggleData} aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(title)}</span><span class="section-toggle-meta">${sec.mode === "single" ? "Choose one" : "Choose any"}${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}>${randomizer}<p class="desc">${escapeHTML(sec.description || "")}</p>${sec.id === "local-powers" ? localTalentMarkup : ""}${unavailableMessage ? `<p class="desc">${escapeHTML(unavailableMessage)}</p>` : `<div class="grid">${items.map(item => {
             return renderCard(sec, item);
         }).join("")}</div>`}</div></section>`;
         }).filter(Boolean);
@@ -279,7 +375,31 @@ function render() {
         const selectedCount = group.sections.reduce((count, sec) => count + sec.items.filter(item => itemAvailable(sec, item) && selected.has(item.id)).length, 0);
         const randomizer = key === "background" ? '<button type="button" class="background-randomize" data-randomize-background>Randomize background</button>' : "";
         return `<section class="section group-section"><button class="section-toggle group-toggle" type="button" data-group="${escapeHTML(key)}" aria-expanded="${expanded}" aria-controls="group-content-${escapeHTML(key)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(group.title)}</span>${selectedCount ? `<span class="section-toggle-meta">${selectedCount} selected</span>` : ""}</span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="group-content" id="group-content-${escapeHTML(key)}" ${expanded ? "" : "hidden"}>${randomizer}${sections.join("")}</div></section>`;
-    }).join("") || '<div class="empty">No matching choices.</div>';
+    };
+    const renderedKeys = new Set();
+    const renderKeys = keys => keys.map(key => {
+        const group = groups.get(key);
+        if (!group) return "";
+        renderedKeys.add(key);
+        return renderGroup(key, group);
+    }).join("");
+    const geneticOpen = openGroups.has("genetic-predisposition") || Boolean(q);
+    const physiqueMarkup = groups.has("physique") ? renderGroup("physique", groups.get("physique")) : "";
+    if (groups.has("physique")) renderedKeys.add("physique");
+    const geneticSelectedCount = groups.get("physique")?.sections.reduce((count, section) =>
+        count + section.items.filter(item => itemAvailable(section, item) && selected.has(item.id)).length, 0
+    ) || 0;
+    $("#sections-before-genetic").innerHTML = renderKeys(["past", "patron", "world", "background"]);
+    $("#genetic-physique").innerHTML = physiqueMarkup;
+    $("#sections-after-genetic").innerHTML = renderKeys(
+        [...new Set(["perks", "powers", "drawbacks", ...groups.keys()])]
+            .filter(key => !renderedKeys.has(key))
+    );
+    $("#genetic-predisposition-toggle").setAttribute("aria-expanded", String(geneticOpen));
+    $("#genetic-predisposition-toggle").querySelector(".section-toggle-meta").textContent =
+        `Physique, attributes, and appearance${geneticSelectedCount ? ` · ${geneticSelectedCount} selected` : ""}`;
+    $("#genetic-predisposition-content").hidden = !geneticOpen;
+    $("#genetic-predisposition-chevron").textContent = geneticOpen ? "−" : "+";
     $("#stats-toggle").setAttribute("aria-expanded", String(statsOpen));
     $("#stats-content").hidden = !statsOpen;
     $("#stats-chevron").textContent = statsOpen ? "−" : "+";
@@ -288,7 +408,7 @@ function render() {
 function renderCard(section, item) {
     const active = selected.has(item.id), cost = effectiveCost(section, item);
     const reason = choiceDisabledReason(section, item);
-    return `<article class="card ${active ? "selected" : ""} ${reason ? "disabled" : ""}" data-id="${escapeHTML(item.id)}" role="button" tabindex="${reason ? "-1" : "0"}" aria-pressed="${active}" aria-disabled="${Boolean(reason)}"><div class="card-top"><h3>${escapeHTML(item.name)}</h3><span class="cost ${cost > 0 ? "spend" : ""}">${costLabel(cost)}</span></div><p>${escapeHTML(item.description || "No description yet.")}</p><span class="tag">${active ? "Selected" : escapeHTML(reason || "Click to select")}</span></article>`;
+    return `<article class="card ${active ? "selected" : ""} ${reason ? "disabled" : ""}" data-id="${escapeHTML(item.id)}" role="button" tabindex="${reason ? "-1" : "0"}" aria-pressed="${active}" aria-disabled="${Boolean(reason)}"><div class="card-top"><h3>${escapeHTML(item.name)}</h3><span class="cost ${cost > 0 ? "spend" : ""}">${escapeHTML(displayedCost(section, item))}</span></div><p>${escapeHTML(item.description || "No description yet.")}</p><span class="tag">${active ? "Selected" : escapeHTML(reason || "Click to select")}</span></article>`;
 }
 function toggle(id) {
     let sec = data.sections.find(s => s.items.some(i => i.id === id)); if (!sec) return;
@@ -296,6 +416,10 @@ function toggle(id) {
     if (!itemAvailable(sec, item)) return;
     if (sec.id === "patron-alignment" && selected.has(id)) return;
     if (selected.has(id)) {
+        if (item.breaksStatLimits && !allocationsWithinStatLimits(new Set([...selected].filter(selectedId => selectedId !== id)))) {
+            alert("Reduce other attribute allocations to within the Constitution limit before removing Broken Limits.");
+            return;
+        }
         selected.delete(id);
         clearUnavailableSelections();
         render();
@@ -310,7 +434,7 @@ function toggle(id) {
 function renderStats() {
     if (!data.stats) return;
     $("#stat-description").textContent = data.stats.description;
-    $("#stat-rule").textContent = "Final stats include selected physique multipliers, which stack multiplicatively. Modified Constitution sets the allocation cap for every other stat at twice its value. Reclaiming a point returns it to your pool; selling one returns 1 karma and permanently removes that point from your pool.";
+    $("#stat-rule").textContent = `Final stats include selected physique multipliers, which stack multiplicatively. ${breaksStatLimits() ? "Broken Limits removes Constitution's allocation cap for other stats." : "Modified Constitution sets the allocation cap for every other stat at twice its value."} Reclaiming a point returns it to your pool; selling one returns 1 karma and permanently removes that point from your pool.`;
     const remaining = availableAttributePoints();
     $("#stat-points-remaining").textContent = `${remaining} attribute ${remaining === 1 ? "point" : "points"} available`;
     $("#buy-stat-point").disabled = availableKarma() < 1;
@@ -319,12 +443,16 @@ function renderStats() {
         const value = Number(stats[a.id]) || 0;
         const multiplier = statMultiplier(a.id);
         const finalValue = value * multiplier;
+        const tier = statTier(finalValue);
         const limit = statLimit(a);
         const maxValue = a.id === "constitution"
             ? value + remaining
             : Math.min(limit, value + remaining);
-        const limitLabel = a.id === "constitution" ? "sets effective cap" : `max ${formatStat(limit)} allocated`;
-        return `<article class="stat-box"><div class="stat-box-heading"><h3>${escapeHTML(a.name)}</h3><span class="stat-value">${formatStat(finalValue)}<span class="stat-limit">${value} allocated · ×${formatStat(multiplier)}</span></span></div><p>${escapeHTML(a.description)}</p><div class="stat-allocation-control"><label class="stat-number-control">Allocated points<input type="number" class="stat-allocation-input" data-stat="${escapeHTML(a.id)}" value="${value}" min="0" max="${formatStat(maxValue)}" step="1" inputmode="numeric" aria-label="${escapeHTML(a.name)} allocated points"></label><span class="stat-limit">${escapeHTML(limitLabel)}</span></div></article>`;
+        const limitLabel = a.id === "constitution"
+            ? "sets effective cap"
+            : breaksStatLimits() ? "no Constitution limit"
+                : `max ${formatStat(limit)} allocated`;
+        return `<article class="stat-box"><div class="stat-box-heading"><h3>${escapeHTML(a.name)}</h3><span class="stat-value">${formatStat(finalValue)}<span class="stat-limit">${value} allocated · ×${formatStat(multiplier)}</span></span></div><p>${escapeHTML(a.description)}</p><div class="stat-tier"><strong>${escapeHTML(tier.name)}</strong><p>${escapeHTML(tier.description)}</p></div><div class="stat-allocation-control"><label class="stat-number-control">Allocated points<input type="number" class="stat-allocation-input" data-stat="${escapeHTML(a.id)}" value="${value}" min="0" max="${formatStat(maxValue)}" step="1" inputmode="numeric" aria-label="${escapeHTML(a.name)} allocated points"></label><span class="stat-limit">${escapeHTML(limitLabel)}</span></div></article>`;
     }).join("");
     const appearanceSections = data.sections.filter(section => section.id.startsWith("appearance-"));
     const query = ($("#search")?.value || "").toLowerCase();
@@ -411,7 +539,7 @@ function renderSummary() {
         ? `<div class="summary-sections">${[...grouped].map(([title, entries]) => `<section class="summary-section"><h3>${escapeHTML(title)}</h3><ul>${entries.map(entry => {
             if (entry.ethnicity) return `<li><strong>Ethnicity:</strong> ${escapeHTML(entry.ethnicity)}</li>`;
             const { section, item } = entry;
-            return `<li><strong>${escapeHTML(item.name)}</strong> <span class="muted">(${costLabel(effectiveCost(section, item))})</span>${showDescriptions ? `<p>${escapeHTML(item.description || "No description provided.")}</p>` : ""}</li>`;
+            return `<li><strong>${escapeHTML(item.name)}</strong> <span class="muted">(${escapeHTML(displayedCost(section, item))})</span>${showDescriptions ? `<p>${escapeHTML(item.description || "No description provided.")}</p>` : ""}</li>`;
         }).join("")}</ul></section>`).join("")}${attributeEntries.length ? `<section class="summary-section"><h3>Attributes</h3><ul>${attributeEntries.join("")}</ul></section>` : ""}</div>`
         : attributeEntries.length
             ? `<div class="summary-sections"><section class="summary-section"><h3>Attributes</h3><ul>${attributeEntries.join("")}</ul></section></div>`
@@ -479,16 +607,7 @@ function importChoiceIds() {
             importedStats[attribute.id] ?? 0
         ]));
     }
-    let reason = "";
-    if (hasStats) {
-        const constitution = Number(stats.constitution) || 0;
-        for (const attribute of data.stats.attributes) {
-            if (attribute.id !== "constitution" && (Number(stats[attribute.id]) || 0) > constitution * statMultiplier("constitution") * 2) {
-                reason = `${attribute.name} exceeds the limit set by Constitution.`;
-                break;
-            }
-        }
-    }
+    let reason = hasStats && !allocationsWithinStatLimits() ? "An attribute exceeds the limit set by Constitution." : "";
     for (const { section, item } of selectedChoices()) {
         if (reason) break;
         const duplicate = section.mode === "single" && section.items.filter(choice => selected.has(choice.id)).length > 1;
@@ -515,7 +634,7 @@ function importChoiceIds() {
     renderSummary();
     $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} and ${hasStats ? "attribute allocations" : "no attribute allocations"} imported.`;
 }
-function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = placePatronAfterPast(addDefaultModifiers(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj.data), null))); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = placePatronAfterPast(addDefaultModifiers(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj), null))); selected.clear(); appearanceEthnicity = "" } localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT)); clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
+function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = placePatronAfterPast(addDefaultChoiceMetadata(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj.data), null))); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = placePatronAfterPast(addDefaultChoiceMetadata(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj), null))); selected.clear(); appearanceEthnicity = "" } localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT)); clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
 document.addEventListener("click", e => {
     const card = e.target.closest(".card[data-id]"); if (card) toggle(card.dataset.id);
     const alignmentChoice = e.target.closest("[data-alignment-choice]");
@@ -566,6 +685,7 @@ document.addEventListener("click", e => {
         render();
         return;
     }
+    if (e.target.closest("#stats-toggle")) { statsOpen = !statsOpen; render(); return }
     const sectionToggle = e.target.closest(".subsection-toggle");
     if (sectionToggle) {
         const section = sectionToggle.closest(".section");
@@ -573,7 +693,6 @@ document.addEventListener("click", e => {
         else openSections.add(section.id);
         render();
     }
-    if (e.target.closest("#stats-toggle")) { statsOpen = !statsOpen; render() }
     if (e.target.closest("#reset")) { if (confirm("Reset selections, stat allocations, appearance notes, and bought or sold attribute points? Spent karma will not be refunded.")) { selected.clear(); stats = {}; appearanceEthnicity = ""; attributePointsBought = 0; attributePointsSold = 0; save(); render() } }
     if (e.target.closest("#summary")) openSummary();
     if (e.target.closest("#close-summary")) $("#summary-modal").classList.remove("open");
@@ -602,12 +721,13 @@ document.addEventListener("change", e => {
         const previousValue = Number(stats[id]) || 0;
         const nextValue = e.target.valueAsNumber;
         let error = "";
+        const proposedStats = { ...stats, [id]: nextValue };
         if (!Number.isInteger(nextValue) || nextValue < 0) error = "Enter a whole number of 0 or greater.";
         else if (nextValue > previousValue && nextValue - previousValue > availableAttributePoints()) error = "Not enough attribute points available.";
         else if (nextValue > statLimit(attribute)) error = `This stat is limited to ${formatStat(statLimit(attribute))} allocated points.`;
-        else if (id === "constitution" && nextValue < previousValue) {
+        else if (id === "constitution" && nextValue < previousValue && !breaksStatLimits()) {
             const newLimit = nextValue * statMultiplier("constitution") * 2;
-            if (data.stats.attributes.some(item => item.id !== "constitution" && (Number(stats[item.id]) || 0) > newLimit)) {
+            if (data.stats.attributes.some(item => item.id !== "constitution" && (Number(proposedStats[item.id]) || 0) > newLimit)) {
                 error = "Reclaim points from other attributes before lowering Constitution.";
             }
         }
