@@ -15,7 +15,7 @@ window.KARMA_DATA = {
     {
       "id": "patron-alignment",
       "title": "Patron: Alignment",
-      "description": "Choose an alignment to learn what its patrons offer, then choose one patron whose story you want to live.",
+      "description": "Patrons shape the genre and direction of your next life depending on how much karma you ask them to loan you. Choose a Good, Neutral, or Bad / Evil patron, or choose You. each alignment of patron offers a perk.",
       "mode": "single",
       "items": [
         {
@@ -43,11 +43,16 @@ window.KARMA_DATA = {
     },
     {
       "id": "patron-choices",
-      "title": "Patron: Choose a Patron",
-      "description": "Choose the patron whose preferred story will shape your next life.",
+      "title": "Patron",
+      "description": "Choose the patron whose principles will shape your next life.",
       "mode": "single",
-      "requiresAlignment": true,
       "items": [
+        {
+          "id": "patron-you",
+          "name": "You",
+          "cost": 0,
+          "description": "Your patron is a version of yourself who reached the position of a patron. Another you helped loan them some points, and now they want to pass the torch back to you—passing it backward through the cycle of lives."
+        },
         {
           "id": "patron-keeper-eternal-hearth",
           "name": "The Keeper of the Eternal Hearth",
@@ -158,7 +163,7 @@ window.KARMA_DATA = {
     {
       "id": "patron-loan",
       "title": "Patron: Loan",
-      "description": "A loan is your patron's investment in the story they want to see. Taking one lets them nudge your fate toward their preferred genre; the larger the loan, the stronger the narrative pull. Choose one amount.",
+      "description": "Don't have enough points? You may optionally ask your patron for a loan. In exchange, their karma them nudge your destiny toward the principles; the larger the loan, the stronger the narrative pull. Choose one amount, or skip the loan.",
       "mode": "single",
       "requiresPatron": true,
       "items": [

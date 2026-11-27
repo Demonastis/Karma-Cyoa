@@ -20,7 +20,8 @@
             <div class="eyebrow">Manage your CYOA</div>
             <h1>Edit the content.</h1>
             <p class="muted">Change titles, descriptions, costs, and selection rules; add or remove sections and
-                choices. Changes are stored in this browser. Export a JSON backup to move edits to another device.</p>
+                choices. Changes are stored in this browser. New content updates merge into your saved content while
+                keeping your edits and custom additions. Export a JSON backup to move edits to another device.</p>
         </header>
         <div class="toolbar"><input id="filter" placeholder="Filter sections and choices…"><button id="reset-content"
                 class="danger">Restore original content</button></div>
@@ -28,19 +29,22 @@
         <datalist id="choice-id-options"></datalist>
     </main>
     <script src="data.js"></script>
+    <script src="content-sync.js"></script>
     <script>
         const clone = o => JSON.parse(JSON.stringify(o)), DEFAULT = clone(window.KARMA_DATA);
         function migratePatronSections(content) {
             const oldAlignment = content.sections.find(section => section.id === "patron-alignment");
+            if (!oldAlignment) return content;
             if (oldAlignment?.items.some(item => item.id.startsWith("alignment-"))) return content;
             const oldPatrons = new Map((oldAlignment?.items || []).map(item => [item.id, item]));
             const newPatrons = clone(DEFAULT.sections.find(section => section.id === "patron-choices"));
+            const defaultPatronIds = new Set(newPatrons.items.map(item => item.id));
             newPatrons.items.forEach(item => {
                 const old = oldPatrons.get(item.id);
-                if (old) {
-                    item.cost = old.cost;
-                    item.description = old.description;
-                }
+                if (old) Object.assign(item, clone(old));
+            });
+            oldPatrons.forEach((item, id) => {
+                if (!defaultPatronIds.has(id)) newPatrons.items.push(clone(item));
             });
             const alignment = clone(DEFAULT.sections.find(section => section.id === "patron-alignment"));
             const alignmentIndex = content.sections.findIndex(section => section.id === "patron-alignment");
@@ -53,21 +57,34 @@
             content.sections = content.sections.filter((section, index) =>
                 section.id !== "patron-choices" || index === content.sections.findIndex(item => item.id === "patron-choices")
             );
-            localStorage.setItem("karma-data", JSON.stringify(content));
             return content;
         }
-        function addDefaultAppearanceSections(content) {
-            const existing = new Set(content.sections.map(section => section.id));
-            DEFAULT.sections.filter(section => section.id.startsWith("appearance-") && !existing.has(section.id))
-                .forEach(section => content.sections.push(clone(section)));
+        function normalizeAppearance(content) {
             const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
-            if (ethnicity) {
-                ethnicity.items = [];
-                ethnicity.description = DEFAULT.sections.find(section => section.id === "appearance-ethnicity").description;
-            }
+            if (ethnicity) ethnicity.items = [];
             return content;
         }
-        let data = (() => { try { const saved = localStorage.getItem("karma-data"); return saved ? addDefaultAppearanceSections(migratePatronSections(JSON.parse(saved))) : clone(DEFAULT) } catch { return clone(DEFAULT) } })();
+        function placePatronAfterPast(content) {
+            const patronSections = content.sections.filter(section => section.id.startsWith("patron-"));
+            if (!patronSections.length) return content;
+            content.sections = content.sections.filter(section => !section.id.startsWith("patron-"));
+            const pastIndex = content.sections.findIndex(section => section.id === "karma");
+            content.sections.splice(pastIndex < 0 ? 0 : pastIndex + 1, 0, ...patronSections);
+            return content;
+        }
+        let data = (() => {
+            try {
+                const saved = localStorage.getItem("karma-data");
+                const base = localStorage.getItem("karma-data-base");
+                const content = saved
+                    ? window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(JSON.parse(saved)), base ? JSON.parse(base) : null)
+                    : clone(DEFAULT);
+                const normalized = placePatronAfterPast(normalizeAppearance(content));
+                localStorage.setItem("karma-data", JSON.stringify(normalized));
+                localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT));
+                return normalized;
+            } catch { return clone(DEFAULT) }
+        })();
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         function save() { localStorage.setItem("karma-data", JSON.stringify(data)); }
         const ids = value => Array.isArray(value) ? value.join(", ") : String(value || "");
@@ -151,7 +168,9 @@
                 save(); render();
             }
             if (button.id === "reset-content" && confirm("Restore the original content? Your current edits will be lost.")) {
-                data = clone(DEFAULT); save(); render();
+                data = placePatronAfterPast(clone(DEFAULT));
+                localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT));
+                save(); render();
             }
             if (button.id === "export") {
                 const anchor = document.createElement("a");

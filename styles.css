@@ -358,6 +358,10 @@ textarea {
   padding: 10px 0 0;
 }
 
+.you-patron-choice {
+  margin-bottom: 20px;
+}
+
 .section-toggle-main {
   display: flex;
   flex-direction: column;
