@@ -14,27 +14,23 @@ function addDefaultModifiers(content) {
         const source = defaultItems.get(item.id);
         if (item.modifiers === undefined && source?.modifiers) item.modifiers = clone(source.modifiers);
     }));
-    const sectionIds = new Set(content.sections?.map(section => section.id));
-    DEFAULT.sections.filter(section => section.id.startsWith("appearance-") && !sectionIds.has(section.id))
-        .forEach(section => content.sections.push(clone(section)));
     const ethnicity = content.sections.find(section => section.id === "appearance-ethnicity");
-    if (ethnicity) {
-        ethnicity.items = [];
-        ethnicity.description = DEFAULT.sections.find(section => section.id === "appearance-ethnicity").description;
-    }
+    if (ethnicity) ethnicity.items = [];
     return content;
 }
 function migratePatronSections(content) {
     const oldAlignment = content.sections.find(section => section.id === "patron-alignment");
+    if (!oldAlignment) return content;
     if (oldAlignment?.items.some(item => item.id.startsWith("alignment-"))) return content;
     const oldPatrons = new Map((oldAlignment?.items || []).map(item => [item.id, item]));
     const newPatrons = clone(DEFAULT.sections.find(section => section.id === "patron-choices"));
+    const defaultPatronIds = new Set(newPatrons.items.map(item => item.id));
     newPatrons.items.forEach(item => {
         const old = oldPatrons.get(item.id);
-        if (old) {
-            item.cost = old.cost;
-            item.description = old.description;
-        }
+        if (old) Object.assign(item, clone(old));
+    });
+    oldPatrons.forEach((item, id) => {
+        if (!defaultPatronIds.has(id)) newPatrons.items.push(clone(item));
     });
     const alignment = clone(DEFAULT.sections.find(section => section.id === "patron-alignment"));
     const alignmentIndex = content.sections.findIndex(section => section.id === "patron-alignment");
@@ -47,21 +43,36 @@ function migratePatronSections(content) {
     content.sections = content.sections.filter((section, index) =>
         section.id !== "patron-choices" || index === content.sections.findIndex(item => item.id === "patron-choices")
     );
-    localStorage.setItem("karma-data", JSON.stringify(content));
+    return content;
+}
+function placePatronAfterPast(content) {
+    const patronSections = content.sections.filter(section => section.id.startsWith("patron-"));
+    if (!patronSections.length) return content;
+    content.sections = content.sections.filter(section => !section.id.startsWith("patron-"));
+    const pastIndex = content.sections.findIndex(section => section.id === "karma");
+    content.sections.splice(pastIndex < 0 ? 0 : pastIndex + 1, 0, ...patronSections);
     return content;
 }
 function migrateSelectedPatron(selectedItems, oldData) {
     const patronSection = oldData.sections.find(section => section.id === "patron-alignment");
     const selectedIds = new Set(selectedItems);
     patronSection?.items.forEach(item => {
-        if (selectedIds.has(item.id) && item.alignment) selectedIds.add(`alignment-${item.alignment}`);
+        if (item.id.startsWith("alignment-")) selectedIds.delete(item.id);
     });
     return selectedIds;
 }
 function loadData() {
     try {
         const saved = localStorage.getItem("karma-data");
-        return addDefaultModifiers(saved ? migratePatronSections(JSON.parse(saved)) : clone(DEFAULT));
+        const base = localStorage.getItem("karma-data-base");
+        const previousDefaults = base ? JSON.parse(base) : null;
+        const localContent = saved ? migratePatronSections(JSON.parse(saved)) : clone(DEFAULT);
+        const content = placePatronAfterPast(addDefaultModifiers(saved
+            ? window.KARMA_CONTENT_SYNC.merge(DEFAULT, localContent, previousDefaults)
+            : localContent));
+        localStorage.setItem("karma-data", JSON.stringify(content));
+        localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT));
+        return content;
     } catch { return clone(DEFAULT) }
 }
 function loadStats() { try { return JSON.parse(localStorage.getItem("karma-stats")) || {} } catch { return {} } }
@@ -80,8 +91,7 @@ function selectedPatron() {
     return section?.items.find(item => selected.has(item.id));
 }
 function selectedAlignment() {
-    const section = data.sections.find(item => item.id === "patron-alignment");
-    return section?.items.find(item => selected.has(item.id));
+    return selectedPatron();
 }
 function sectionAvailable(section) {
     const patron = selectedPatron();
@@ -94,7 +104,7 @@ function sectionAvailable(section) {
 }
 function itemAvailable(section, item) {
     return sectionAvailable(section)
-        && (!item.alignment || item.alignment === selectedAlignment()?.alignment || section.id === "patron-alignment")
+        && (section.id === "patron-choices" || !item.alignment || item.alignment === selectedAlignment()?.alignment || section.id === "patron-alignment")
         && (!item.requiresPatron || item.requiresPatron === selectedPatron()?.id);
 }
 function choiceIds(value) {
@@ -142,7 +152,7 @@ function sectionVisible(section) {
 }
 function clearUnavailableSelections() {
     selected.forEach(id => {
-        if (!findChoice(id)) selected.delete(id);
+        if (!findChoice(id) || id.startsWith("alignment-")) selected.delete(id);
     });
     data.sections.forEach(section => section.items.forEach(item => {
         if (selected.has(item.id) && !itemAvailable(section, item)) selected.delete(item.id);
@@ -218,25 +228,32 @@ function render() {
             if (sec.id === "patron-choices") return "";
             if (sec.id === "patron-alignment") {
                 const patronSection = data.sections.find(section => section.id === "patron-choices");
+                const youPatron = patronSection?.items.find(item => item.id === "patron-you");
+                const showYouPatron = youPatron && (!q || (`${youPatron.name} ${youPatron.description}`).toLowerCase().includes(q));
                 const patronItems = patronSection?.items.filter(item =>
-                    itemAvailable(patronSection, item) && (item.name + " " + item.description).toLowerCase().includes(q)
+                    item.id !== "patron-you"
+                    && item.alignment
+                    && itemAvailable(patronSection, item)
+                    && (item.name + " " + item.description).toLowerCase().includes(q)
                 ) || [];
                 const alignments = sec.items.filter(item =>
                     (item.name + " " + item.description).toLowerCase().includes(q)
-                    || (selected.has(item.id) && patronItems.length > 0)
+                    || (selectedPatron()?.alignment === item.alignment && patronItems.length > 0)
                 );
-                if (!alignments.length && !patronItems.length) return "";
+                if (!alignments.length && !patronItems.length && !showYouPatron) return "";
                 const expanded = openSections.has(sec.id) || Boolean(q);
-                const selectedCount = sec.items.filter(item => selected.has(item.id)).length
-                    + (patronSection?.items.filter(item => selected.has(item.id)).length || 0);
+                const selectedCount = patronSection?.items.filter(item => selected.has(item.id)).length || 0;
                 const alignmentAccordions = alignments.map(item => {
                     const alignmentKey = `alignment-accordion-${item.alignment}`;
                     const alignmentExpanded = openSections.has(alignmentKey) || Boolean(q);
-                    const current = selected.has(item.id);
-                    const showPatrons = current && alignmentExpanded && patronSection;
-                    return `<section class="section subsection alignment-option" id="${escapeHTML(alignmentKey)}"><button class="section-toggle subsection-toggle alignment-accordion-toggle" type="button" data-alignment-choice="${escapeHTML(item.id)}" aria-pressed="${current}" aria-expanded="${alignmentExpanded}" aria-controls="content-${escapeHTML(alignmentKey)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(item.name)}</span><span class="section-toggle-meta">${current ? "Selected alignment" : "Choose alignment"}${current && selectedPatron() ? ` · ${escapeHTML(selectedPatron().name)}` : ""}</span></span><span class="section-chevron" aria-hidden="true">${alignmentExpanded ? "−" : "+"}</span></button><div class="section-content alignment-accordion-content" id="content-${escapeHTML(alignmentKey)}" ${alignmentExpanded ? "" : "hidden"}>${showPatrons ? `<p class="desc alignment-perk">${escapeHTML(item.description || "")}</p><div class="patron-choice-list"><h3>Choose a ${escapeHTML(item.name)} patron</h3><p class="desc">${escapeHTML(patronSection.description || "")}</p><div class="grid">${patronItems.map(patron => renderCard(patronSection, patron)).join("")}</div></div>` : ""}</div></section>`;
+                    const selectedInAlignment = selectedPatron()?.alignment === item.alignment;
+                    const matchingPatrons = patronItems.filter(patron => patron.alignment === item.alignment);
+                    return `<section class="section subsection alignment-option" id="${escapeHTML(alignmentKey)}"><button class="section-toggle subsection-toggle alignment-accordion-toggle" type="button" data-alignment-choice="${escapeHTML(item.id)}" aria-expanded="${alignmentExpanded}" aria-controls="content-${escapeHTML(alignmentKey)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(item.name)}</span><span class="section-toggle-meta">${selectedInAlignment ? `Patron selected · ${escapeHTML(selectedPatron().name)}` : "Browse patrons"}</span></span><span class="section-chevron" aria-hidden="true">${alignmentExpanded ? "−" : "+"}</span></button><div class="section-content alignment-accordion-content" id="content-${escapeHTML(alignmentKey)}" ${alignmentExpanded ? "" : "hidden"}>${alignmentExpanded ? `<p class="desc alignment-perk">${escapeHTML(item.description || "")}</p><div class="patron-choice-list"><h3>Choose a ${escapeHTML(item.name)} patron</h3><div class="grid">${matchingPatrons.map(patron => renderCard(patronSection, patron)).join("")}</div></div>` : ""}</div></section>`;
                 }).join("");
-                return `<section class="section subsection" id="${escapeHTML(sec.id)}"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(sec.title.replace(/^Patron:\\s*/, ""))}</span><span class="section-toggle-meta">Choose one${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}><p class="desc">${escapeHTML(sec.description || "")}</p>${alignmentAccordions}</div></section>`;
+                const youChoice = showYouPatron
+                    ? `<div class="patron-choice-list you-patron-choice"><h3>A patron from another life</h3><div class="grid">${renderCard(patronSection, youPatron)}</div></div>`
+                    : "";
+                return `<section class="section subsection" id="${escapeHTML(sec.id)}"><button class="section-toggle subsection-toggle" type="button" aria-expanded="${expanded}" aria-controls="content-${escapeHTML(sec.id)}"><span class="section-toggle-main"><span class="section-toggle-title">${escapeHTML(sec.title.replace(/^Patron:\s*/, ""))}</span><span class="section-toggle-meta">Choose one${selectedCount ? ` · ${selectedCount} selected` : ""}</span></span><span class="section-chevron" aria-hidden="true">${expanded ? "−" : "+"}</span></button><div class="section-content" id="content-${escapeHTML(sec.id)}" ${expanded ? "" : "hidden"}><p class="desc">${escapeHTML(sec.description || "")}</p>${youChoice}${alignmentAccordions}</div></section>`;
             }
             const items = sec.items.filter(i => itemAvailable(sec, i) && (i.name + " " + i.description).toLowerCase().includes(q));
             if (!items.length && !["patron-loan", "patron-missions"].includes(sec.id)) return "";
@@ -248,7 +265,7 @@ function render() {
             const title = standalone ? group.title : sec.title.replace(/^Patron:\s*/, "");
             const randomizer = standalone && key === "background" ? '<button type="button" class="background-randomize" data-randomize-background>Randomize background</button>' : "";
             const unavailableMessage = sec.id === "patron-loan" && !selectedPatron()
-                ? "Choose an alignment and patron first to access a loan."
+                ? "Choose a patron first to access an optional loan."
                 : sec.id === "patron-missions" && selectedAlignment()?.alignment !== "neutral"
                     ? selectedPatron() ? "Missions are only available to Neutral patrons." : "Choose a Neutral alignment and patron to unlock missions."
                     : "";
@@ -498,28 +515,15 @@ function importChoiceIds() {
     renderSummary();
     $("#choice-import-status").textContent = `${selected.size} choice${selected.size === 1 ? "" : "s"} and ${hasStats ? "attribute allocations" : "no attribute allocations"} imported.`;
 }
-function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = addDefaultModifiers(migratePatronSections(obj.data)); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = addDefaultModifiers(migratePatronSections(obj)); selected.clear(); appearanceEthnicity = "" } clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
+function importFile(file) { let r = new FileReader(); r.onload = () => { try { let obj = JSON.parse(r.result); if (obj.data) { const legacySelections = migrateSelectedPatron(obj.selected || [], obj.data); data = placePatronAfterPast(addDefaultModifiers(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj.data), null))); selected = legacySelections; points = Number(obj.points) || 0; stats = obj.stats || {}; attributePointsBought = Number(obj.attributePointsBought) || 0; attributePointsSold = Number(obj.attributePointsSold) || 0; appearanceEthnicity = String(obj.appearanceEthnicity || "") } else { data = placePatronAfterPast(addDefaultModifiers(window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(obj), null))); selected.clear(); appearanceEthnicity = "" } localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT)); clearUnavailableSelections(); save(); render(); alert("Import complete.") } catch (e) { alert("Could not import this file: " + e.message) } }; r.readAsText(file) }
 document.addEventListener("click", e => {
     const card = e.target.closest(".card[data-id]"); if (card) toggle(card.dataset.id);
     const alignmentChoice = e.target.closest("[data-alignment-choice]");
     if (alignmentChoice) {
-        const id = alignmentChoice.dataset.alignmentChoice;
-        const section = data.sections.find(item => item.id === "patron-alignment");
-        const alreadySelected = selected.has(id);
         const accordionId = alignmentChoice.closest(".alignment-option").id;
-        if (alreadySelected) {
-            if (openSections.has(accordionId)) openSections.delete(accordionId);
-            else openSections.add(accordionId);
-        } else {
-            section.items.forEach(item => {
-                selected.delete(item.id);
-                if (item.id !== id) openSections.delete(`alignment-accordion-${item.alignment}`);
-            });
-            selected.add(id);
-            openSections.add(accordionId);
-            clearUnavailableSelections();
-            save();
-        }
+        const wasOpen = openSections.has(accordionId);
+        ["good", "neutral", "evil"].forEach(alignment => openSections.delete(`alignment-accordion-${alignment}`));
+        if (!wasOpen) openSections.add(accordionId);
         render();
         return;
     }
