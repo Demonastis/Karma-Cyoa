@@ -437,19 +437,24 @@ textarea {
 
 .card-top {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
   gap: 10px;
 }
 
 .card h3 {
+  min-width: 0;
+  flex: 1 1 120px;
   font-size: 1.05rem;
   font-weight: 800;
   margin: 0;
 }
 
 .cost {
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   background: rgba(56, 242, 157, 0.12);
   border: 1px solid var(--good);
   padding: 2px 8px;
@@ -656,6 +661,23 @@ summary {
   color: var(--muted);
   margin: 0;
   min-height: 3em;
+}
+
+.stat-tier {
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent2);
+  border-radius: 0 10px 10px 0;
+  background: rgba(0, 229, 255, 0.08);
+}
+
+.stat-tier strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent2);
+}
+
+.stat-tier p {
+  min-height: 0;
 }
 
 .stat-value {

@@ -19,7 +19,7 @@
         <header class="hero">
             <div class="eyebrow">Manage your CYOA</div>
             <h1>Edit the content.</h1>
-            <p class="muted">Change titles, descriptions, costs, and selection rules; add or remove sections and
+            <p class="muted">Change titles, descriptions, costs, selection rules, and power world affinities; add or remove sections and
                 choices. Changes are stored in this browser. New content updates merge into your saved content while
                 keeping your edits and custom additions. Export a JSON backup to move edits to another device.</p>
         </header>
@@ -27,6 +27,7 @@
                 class="danger">Restore original content</button></div>
         <div id="editor"></div>
         <datalist id="choice-id-options"></datalist>
+        <datalist id="world-type-options"></datalist>
     </main>
     <script src="data.js"></script>
     <script src="content-sync.js"></script>
@@ -64,6 +65,21 @@
             if (ethnicity) ethnicity.items = [];
             return content;
         }
+        function normalizeWorldAffinities(content) {
+            const defaultItems = new Map(DEFAULT.sections.flatMap(section => section.items.map(item => [item.id, item])));
+            content.sections.forEach(section => section.items.forEach(item => {
+                const source = defaultItems.get(item.id);
+                if (!item.worldAffinities && source?.worldAffinities) item.worldAffinities = clone(source.worldAffinities);
+                if (item.localToWorlds) {
+                    item.worldAffinities = item.worldAffinities || {};
+                    item.localToWorlds.forEach(worldId => {
+                        item.worldAffinities[worldId] = 100;
+                    });
+                    delete item.localToWorlds;
+                }
+            }));
+            return content;
+        }
         function placePatronAfterPast(content) {
             const patronSections = content.sections.filter(section => section.id.startsWith("patron-"));
             if (!patronSections.length) return content;
@@ -79,7 +95,7 @@
                 const content = saved
                     ? window.KARMA_CONTENT_SYNC.merge(DEFAULT, migratePatronSections(JSON.parse(saved)), base ? JSON.parse(base) : null)
                     : clone(DEFAULT);
-                const normalized = placePatronAfterPast(normalizeAppearance(content));
+                const normalized = placePatronAfterPast(normalizeWorldAffinities(normalizeAppearance(content)));
                 localStorage.setItem("karma-data", JSON.stringify(normalized));
                 localStorage.setItem("karma-data-base", JSON.stringify(DEFAULT));
                 return normalized;
@@ -113,6 +129,7 @@
                         <div class="muted small">Choice ID: <code>${esc(item.id)}</code></div>
                         <div class="form-row"><label>Choice name<input data-item="${sectionIndex},${item._index}" data-field="name" value="${esc(item.name)}"></label><label>Cost / reward<input type="number" data-item="${sectionIndex},${item._index}" data-field="cost" value="${Number(item.cost) || 0}"></label></div>
                         <label>Description<textarea data-item="${sectionIndex},${item._index}" data-field="description">${esc(item.description)}</textarea></label>
+                        ${section.id.endsWith("-powers") ? `<fieldset><legend>World affinities</legend><p class="muted small">Affinity determines the power's discount in each world: 100% affinity gives 50% off, 75% gives 37.5% off, 50% gives 25% off, 25% gives 12.5% off, and 0% gives no discount.</p>${(data.sections.find(candidate => candidate.id === "world-type")?.items || []).map(world => `<label>${esc(world.name)}<select data-item="${sectionIndex},${item._index}" data-world-affinity="${esc(world.id)}">${[0, 25, 50, 75, 100].map(affinity => `<option value="${affinity}" ${Number(item.worldAffinities?.[world.id]) === affinity ? "selected" : ""}>${affinity}% affinity</option>`).join("")}</select></label>`).join("")}</fieldset>` : ""}
                         <label>Requires choice IDs<input data-item="${sectionIndex},${item._index}" data-rule-field="requires" list="choice-id-options" value="${esc(ids(item.requires))}" placeholder="choice-id, another-choice-id"><span class="muted small">All listed choices must be selected first. Separate IDs with commas.</span></label>
                         <label>Incompatible choice IDs<input data-item="${sectionIndex},${item._index}" data-rule-field="incompatibleWith" list="choice-id-options" value="${esc(ids(item.incompatibleWith))}" placeholder="choice-id, another-choice-id"><span class="muted small">The listed choices cannot be selected together. This rule works both ways.</span></label>
                         <div class="form-actions"><button class="danger" data-remove-item="${sectionIndex},${item._index}">Delete choice</button></div>
@@ -129,7 +146,15 @@
             } else if (e.target.dataset.item) {
                 const [sectionIndex, itemIndex] = e.target.dataset.item.split(",").map(Number);
                 const item = data.sections[sectionIndex].items[itemIndex];
-                if (e.target.dataset.ruleField) {
+                if (e.target.dataset.worldAffinity) {
+                    item.worldAffinities = item.worldAffinities || {};
+                    const affinity = Number(e.target.value);
+                    if (affinity) item.worldAffinities[e.target.dataset.worldAffinity] = affinity;
+                    else delete item.worldAffinities[e.target.dataset.worldAffinity];
+                    if (!Object.keys(item.worldAffinities).length) delete item.worldAffinities;
+                    save();
+                    return;
+                } else if (e.target.dataset.ruleField) {
                     const values = e.target.value.split(",").map(value => value.trim()).filter(Boolean);
                     if (values.length) item[e.target.dataset.ruleField] = values;
                     else delete item[e.target.dataset.ruleField];
