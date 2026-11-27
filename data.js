@@ -44,7 +44,7 @@ window.KARMA_DATA = {
     {
       "id": "patron-choices",
       "title": "Patron",
-      "description": "Choose the patron whose preferred story will shape your next life.",
+      "description": "Choose the patron whose principles will shape your next life.",
       "mode": "single",
       "items": [
         {
@@ -163,7 +163,7 @@ window.KARMA_DATA = {
     {
       "id": "patron-loan",
       "title": "Patron: Loan",
-      "description": "Don't have enough points? You may optionally ask your patron for a loan. In exchange, their karma them nudge your destiny toward the story they want to see; the larger the loan, the stronger the narrative pull. Choose one amount, or skip the loan.",
+      "description": "Don't have enough points? You may optionally ask your patron for a loan. In exchange, their karma them nudge your destiny toward the principles; the larger the loan, the stronger the narrative pull. Choose one amount, or skip the loan.",
       "mode": "single",
       "requiresPatron": true,
       "items": [
